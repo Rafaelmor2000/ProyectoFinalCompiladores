@@ -1,0 +1,13 @@
+program test;
+main()
+vars
+float ancho, largo, area;
+{
+    %this is a comment
+    ancho = 5.8;
+    largo = -2.69;
+    area = ancho/largo;
+    for i = 1 to 5 do {
+
+    }
+}

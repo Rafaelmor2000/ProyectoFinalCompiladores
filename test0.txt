@@ -1,0 +1,10 @@
+program area;
+vars
+int ancho, largo;
+
+main()
+{
+    ancho = 5;
+    largo = -2;
+    print("el area del rectangulo es: ", ancho * largo);
+}

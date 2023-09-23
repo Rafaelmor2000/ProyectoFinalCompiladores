@@ -1,0 +1,22 @@
+program test;
+vars
+int cantidad;
+main()
+vars
+float ancho, largo, area;
+{
+    ancho = 5.8;
+    largo = -2.69;
+    area = ancho/largo;
+    if (largo > 0) then {
+    }
+    else {
+        if(largo < 1) then {
+            if(largo <> 0) then{
+                while (largo > 0) do {
+                    
+                }
+            }
+        }
+    }
+}

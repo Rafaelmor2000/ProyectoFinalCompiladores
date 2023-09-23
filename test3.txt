@@ -1,0 +1,21 @@
+program area;
+vars
+int ancho, largo;
+function int cuadrado(){
+    print(ancho * ancho);
+}
+
+function int triangulo(float ancho, float altura)
+vars
+float area;
+{
+    area = ancho * altura / 2;
+    return(area);
+}
+
+main()
+{
+    ancho = 5;
+    largo = -2;
+    print("el area del rectangulo es: ", ancho * largo);
+}
