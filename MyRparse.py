@@ -243,7 +243,7 @@ def p_empty(p):
 
 
 def p_error(p):
-    print(f"Syntax error at {p.value!r}")
+    print(f"Syntax error at {p.value!r} in line {p.lineno!r}")
     sys.exit()
 
 

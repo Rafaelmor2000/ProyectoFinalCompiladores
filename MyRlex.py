@@ -55,7 +55,7 @@ tokens = [
 ] + list(reserved.values())
 
 # Ignored characters
-t_ignore = " \t\n"
+t_ignore = " \t"
 
 # Token matching rules are written as regexs
 t_SEMICOLON = r";"
@@ -109,13 +109,17 @@ def t_CTE_I(t):
 
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print("Illegal character '%s' in line '%d'" % t.value[0] % t.lexer.lineno)
     t.lexer.skip(1)
 
 
 def t_LINE_COMMENT(t):
     r"%.*"
     pass
+
+def t_skip_newline(t):
+    r'\n+'
+    t.lexer.lineno += t.value.count("\n")
 
 
 lexer = lex.lex()
