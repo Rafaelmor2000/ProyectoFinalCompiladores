@@ -5,9 +5,24 @@ import ply.yacc as yacc
 
 tokens = MyRlex.tokens
 
+funcID = ""
+programID = ""
+currType = ""
+paramCounter = 0
+fnTable = {}
+
 
 def p_program(p):
-    "program : PROGRAM ID SEMICOLON vars programp main"
+    "program : PROGRAM ID init SEMICOLON vars programp main"
+
+
+def p_init(p):
+    "init :"
+    global programID, funcID
+    programID = p[-1]
+    print("hello there")
+    funcID = programID
+    fnTable[programID] = {"type": "void", "vars": {}}
 
 
 def p_programp(p):
@@ -32,6 +47,8 @@ def p_varspp(p):
 
 def p_varsppp(p):
     "varsppp : ID varspppp"
+    varID = p[1]
+    checkVarOverlap(varID)
 
 
 def p_varspppp(p):
@@ -40,22 +57,38 @@ def p_varspppp(p):
 
 
 def p_function(p):
-    """function : FUNCTION functionp ID parameters vars statements
+    """function : FUNCTION functionp ID funcID parameters vars statements
     | empty"""
 
 
 def p_functionp(p):
     """functionp : type
     | VOID"""
+    global currType
+    currType = str(p[0])
+    print(currType)
 
 
 def p_parameters(p):
-    "parameters : LPAREN parametersp RPAREN"
+    "parameters : LPAREN parametersp RPAREN linkParams"
+    global paramCounter
+    paramCounter = 0
+
+
+def p_linkParams(p):
+    "linkParams :"
+    fnTable[funcID]["params"] = paramCounter
 
 
 def p_parametersp(p):
     """parametersp : type ID parameterspp
     | empty"""
+    if len(p) == 3:
+        global currType, paramCounter
+        currType = str(p[1])
+        varID = str(p[2])
+        paramCounter += 1
+        checkVarOverlap(varID)
 
 
 def p_parameterspp(p):
@@ -64,7 +97,21 @@ def p_parameterspp(p):
 
 
 def p_main(p):
-    "main : MAIN LPAREN RPAREN vars statements"
+    "main : MAIN funcID LPAREN RPAREN vars statements"
+
+
+def p_funcID(p):
+    "funcID :"
+    global funcID, currType
+    funcID = p[-1]
+    checkFuncOverlap()
+    print(currType)
+
+
+def p_mainID(p):
+    global funcID
+    funcID = p[-1]
+    fnTable[funcID] = {"type": "void", "vars": {}}
 
 
 def p_statements(p):
@@ -235,6 +282,8 @@ def p_type(p):
     """type : INT
     | FLOAT
     | CHAR"""
+    global currType
+    currType = str(p[1])
 
 
 def p_empty(p):
@@ -243,8 +292,33 @@ def p_empty(p):
 
 
 def p_error(p):
-    print(f"Syntax error at {p.value!r} in line {p.lineno!r}")
+    if p is None:
+        print(f"Missing \u007D at end of file")
+    else:
+        print(f"Syntax error at {p.value!r} in line {p.lineno!r}")
     sys.exit()
+
+
+def checkVarOverlap(id):
+    global fnTable
+    overlap = False
+    if id in fnTable[programID]["vars"]:
+        overlap = True
+        if funcID != programID:
+            if id in fnTable[funcID]["vars"]:
+                overlap = True
+    if not overlap:
+        fnTable[funcID]["vars"][id] = currType
+    else:
+        print(f"Variable name {id} has been declared elsewhere")
+
+
+def checkFuncOverlap():
+    global fnTable
+    if funcID in fnTable:
+        print(f"Function name {funcID} has been declared elsewhere")
+    else:
+        fnTable[funcID] = {"type": currType, "vars": {}}
 
 
 # Build the parser
@@ -260,3 +334,4 @@ if __name__ == "__main__":
 
     parser.parse(inputCode)
     print("All good!")
+    print(fnTable)

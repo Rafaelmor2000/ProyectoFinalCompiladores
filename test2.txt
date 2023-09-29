@@ -1,6 +1,9 @@
 program test;
 vars
 int cantidad;
+function void cuadrado(int cantidad){
+    print(ancho * ancho);
+}
 main()
 vars
 float ancho, largo, area;
