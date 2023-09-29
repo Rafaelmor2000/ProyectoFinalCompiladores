@@ -20,7 +20,6 @@ def p_init(p):
     "init :"
     global programID, funcID
     programID = p[-1]
-    print("hello there")
     funcID = programID
     fnTable[programID] = {"type": "void", "vars": {}}
 
@@ -66,7 +65,14 @@ def p_functionp(p):
     | VOID"""
     global currType
     if p[1] == "void":
-        currType = str(p[1])
+        currType = p[1]
+
+
+def p_funcID(p):
+    "funcID :"
+    global funcID
+    funcID = p[-1]
+    checkFuncOverlap()
 
 
 def p_parameters(p):
@@ -84,10 +90,8 @@ def p_parametersp(p):
     """parametersp : type ID parameterspp
     | empty"""
     if len(p) == 4:
-        print("entered!")
-        global currType, paramCounter
-        currType = str(p[1])
-        varID = str(p[2])
+        global paramCounter
+        varID = p[2]
         paramCounter += 1
         checkVarOverlap(varID)
 
@@ -98,14 +102,15 @@ def p_parameterspp(p):
 
 
 def p_main(p):
-    "main : MAIN funcID LPAREN RPAREN vars statements"
+    "main : MAIN mainID LPAREN RPAREN vars statements"
 
 
-def p_funcID(p):
-    "funcID :"
+def p_mainID(p):
+    "mainID :"
     global funcID, currType
-    funcID = p[-1]
-    checkFuncOverlap()
+    funcID = "main"
+    currType = "void"
+    fnTable[funcID] = {"type": currType, "vars": {}}
 
 
 def p_statements(p):
@@ -298,9 +303,9 @@ def checkVarOverlap(id):
     overlap = False
     if id in fnTable[programID]["vars"]:
         overlap = True
-        if funcID != programID:
-            if id in fnTable[funcID]["vars"]:
-                overlap = True
+    if funcID != programID:
+        if id in fnTable[funcID]["vars"]:
+            overlap = True
     if not overlap:
         fnTable[funcID]["vars"][id] = currType
     else:
@@ -331,5 +336,6 @@ if __name__ == "__main__":
     parser.parse(inputCode)
     print("All good!")
 
+    # mostrar tabla de funciones
     for key in fnTable:
         print(f"{key} : {fnTable[key]}")
