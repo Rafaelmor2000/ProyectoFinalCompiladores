@@ -5,11 +5,11 @@ function void cuadrado(){
     print(ancho * ancho);
 }
 
-function int cuadrado(float ancho, float altura)
+function int triangulo(float grosor, float altura)
 vars
 float area;
 {
-    area = ancho * altura / 2;
+    area = grosor * altura / 2;
     return(area);
 }
 

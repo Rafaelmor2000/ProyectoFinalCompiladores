@@ -65,8 +65,8 @@ def p_functionp(p):
     """functionp : type
     | VOID"""
     global currType
-    currType = str(p[1])
-    print(currType)
+    if p[1] == "void":
+        currType = str(p[1])
 
 
 def p_parameters(p):
@@ -83,7 +83,8 @@ def p_linkParams(p):
 def p_parametersp(p):
     """parametersp : type ID parameterspp
     | empty"""
-    if len(p) == 3:
+    if len(p) == 4:
+        print("entered!")
         global currType, paramCounter
         currType = str(p[1])
         varID = str(p[2])
@@ -329,4 +330,6 @@ if __name__ == "__main__":
 
     parser.parse(inputCode)
     print("All good!")
-    print(fnTable)
+
+    for key in fnTable:
+        print(f"{key} : {fnTable[key]}")
