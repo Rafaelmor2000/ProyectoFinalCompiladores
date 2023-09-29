@@ -65,7 +65,7 @@ def p_functionp(p):
     """functionp : type
     | VOID"""
     global currType
-    currType = str(p[0])
+    currType = str(p[1])
     print(currType)
 
 
@@ -105,13 +105,6 @@ def p_funcID(p):
     global funcID, currType
     funcID = p[-1]
     checkFuncOverlap()
-    print(currType)
-
-
-def p_mainID(p):
-    global funcID
-    funcID = p[-1]
-    fnTable[funcID] = {"type": "void", "vars": {}}
 
 
 def p_statements(p):
@@ -311,12 +304,14 @@ def checkVarOverlap(id):
         fnTable[funcID]["vars"][id] = currType
     else:
         print(f"Variable name {id} has been declared elsewhere")
+        sys.exit()
 
 
 def checkFuncOverlap():
     global fnTable
     if funcID in fnTable:
         print(f"Function name {funcID} has been declared elsewhere")
+        sys.exit()
     else:
         fnTable[funcID] = {"type": currType, "vars": {}}
 

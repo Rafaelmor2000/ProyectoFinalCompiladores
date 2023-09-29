@@ -1,11 +1,11 @@
 program area;
 vars
 int ancho, largo;
-function int cuadrado(){
+function void cuadrado(){
     print(ancho * ancho);
 }
 
-function int triangulo(float ancho, float altura)
+function int cuadrado(float ancho, float altura)
 vars
 float area;
 {

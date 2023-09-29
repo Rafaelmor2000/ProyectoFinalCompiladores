@@ -1,8 +1,12 @@
 program area;
 vars
 int ancho, largo;
+float alto;
+int algo;
 
 main()
+vars 
+float otro;
 {
     ancho = 5;
     largo = -2;
