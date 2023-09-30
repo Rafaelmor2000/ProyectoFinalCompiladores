@@ -1,5 +1,6 @@
 import sys
 
+import MyRCube
 import MyRlex
 import ply.yacc as yacc
 
