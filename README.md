@@ -6,6 +6,7 @@ Avance 1:
 - Diseñar casos de prueba: test0.txt, test1.txt, test2.txt, test3.txt
 
 Avance 2:
+- Agregar a mensajes de errores de gramática linea del error
 - Diseñar e implementar tabla de funciones y variables
 - Implementar verificación de nombres repetidos en funciones y variables
 - Modificar casos de prueba para incluir nuevas implementaciones
