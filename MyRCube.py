@@ -1,6 +1,6 @@
 class MyRCube:
     def __init__(self) -> None:
-        self.Cube = {
+        self.CUBE = {
             "int": {
                 "int": {
                     "+": "int",

@@ -3,6 +3,7 @@ import sys
 import MyRCube
 import MyRlex
 import ply.yacc as yacc
+from Quad import *
 
 tokens = MyRlex.tokens
 
@@ -11,6 +12,12 @@ programID = ""
 currType = ""
 paramCounter = 0
 fnTable = {}
+cube = MyRCube.MyRCube().CUBE
+quadList = []
+testQuad = Quad("+", "A", "B", "t1")
+quadList.append(testQuad)
+for quad in quadList:
+    print(str(quad))
 
 
 def p_program(p):
@@ -258,6 +265,10 @@ def p_factor(p):
     """factor : LPAREN expression RPAREN
     | var_cte
     | variable"""
+    if len(p) == 4:
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
 
 
 def p_variable(p):
@@ -283,7 +294,7 @@ def p_type(p):
     | FLOAT
     | CHAR"""
     global currType
-    currType = str(p[1])
+    currType = p[1]
 
 
 def p_empty(p):
