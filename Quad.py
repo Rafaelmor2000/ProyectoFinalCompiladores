@@ -6,4 +6,4 @@ class Quad:
         self.temp = temp
 
     def __str__(self):
-        return f"[{self.operator}, {self.operand1}, {self.operand2}, {self.temp}]"
+        return f"[{self.operator}, {self.operand1.get('id')}, {self.operand2.get('id')}, {self.temp}]"

@@ -7,6 +7,30 @@ from Quad import *
 
 tokens = MyRlex.tokens
 
+precedence = (
+    ("left", "AND", "OR"),
+    (
+        "left",
+        "EQUALS",
+        "LTHAN",
+        "GTHAN",
+        "LEQUAL",
+        "GEQUAL",
+        "DIFFERENCE",
+    ),
+    (
+        "left",
+        "PLUS",
+        "MINUS",
+    ),
+    (
+        "left",
+        "TIMES",
+        "DIVIDE",
+        "MOD",
+    ),
+)
+
 funcID = ""
 programID = ""
 currType = ""
@@ -52,13 +76,16 @@ def p_varspp(p):
 
 def p_varsppp(p):
     "varsppp : ID varspppp"
-    varID = p[1]
-    checkVarOverlap(varID)
 
 
 def p_varspppp(p):
     """varspppp : LBRACKET CTE_I RBRACKET
     | empty"""
+    varID = p[-1]
+    arrSize = 0
+    if len(p) == 4:
+        arrSize = p[2]
+    checkVarOverlap(varID, arrSize)
 
 
 def p_function(p):
@@ -99,7 +126,7 @@ def p_parametersp(p):
         global paramCounter
         varID = p[2]
         paramCounter += 1
-        checkVarOverlap(varID)
+        checkVarOverlap(varID, 0)
 
 
 def p_parameterspp(p):
@@ -224,11 +251,7 @@ def p_expressionp(p):
     | empty"""
     global quadList
     if len(p) == 3:
-        if p[1] == "&":
-            newQuad = Quad("&", p[-1], p[2], "idk")
-        elif p[1] == "|":
-            newQuad = Quad("|", p[-1], p[2], "idk")
-        quadList.append(newQuad)
+        genQuad(p[1])
 
 
 def p_bool_exp(p):
@@ -245,19 +268,7 @@ def p_bool_expp(p):
     | empty"""
     global quadList
     if len(p) == 3:
-        if p[1] == "<":
-            newQuad = Quad("<", p[-1], p[2], "idk")
-        elif p[1] == ">":
-            newQuad = Quad(">", p[-1], p[2], "idk")
-        elif p[1] == "==":
-            newQuad = Quad("==", p[-1], p[2], "idk")
-        elif p[1] == "<>":
-            newQuad = Quad("<>", p[-1], p[2], "idk")
-        elif p[1] == "<=":
-            newQuad = Quad(">=", p[-1], p[2], "idk")
-        elif p[1] == ">":
-            newQuad = Quad("<=", p[-1], p[2], "idk")
-        quadList.append(newQuad)
+        genQuad(p[1])
 
 
 def p_arit_exp(p):
@@ -270,11 +281,7 @@ def p_arit_expp(p):
     | empty"""
     global quadList
     if len(p) == 3:
-        if p[1] == "+":
-            newQuad = Quad("+", p[-1], p[2], "idk")
-        elif p[1] == "-":
-            newQuad = Quad("-", p[-1], p[2], "idk")
-        quadList.append(newQuad)
+        genQuad(p[1])
 
 
 def p_term(p):
@@ -288,13 +295,7 @@ def p_termp(p):
     | empty"""
     global quadList
     if len(p) == 3:
-        if p[1] == "*":
-            newQuad = Quad("*", p[-1], p[2], "idk")
-        elif p[1] == "/":
-            newQuad = Quad("/", p[-1], p[2], "idk")
-        elif p[1] == "%":
-            newQuad = Quad("%", p[-1], p[2], "idk")
-        quadList.append(newQuad)
+        genQuad(p[1])
 
 
 def p_factor(p):
@@ -385,7 +386,7 @@ def p_error(p):
     sys.exit()
 
 
-def checkVarOverlap(id):
+def checkVarOverlap(id, arrSize):
     global fnTable
     overlap = False
     if id in fnTable[programID]["vars"]:
@@ -394,7 +395,11 @@ def checkVarOverlap(id):
         if id in fnTable[funcID]["vars"]:
             overlap = True
     if not overlap:
-        fnTable[funcID]["vars"][id] = currType
+        fnTable[funcID]["vars"][id] = {
+            "type": currType,
+            "arrSize": arrSize,
+            "dir": None,
+        }
     else:
         print(f"Variable name {id} has been declared elsewhere")
         sys.exit()
@@ -403,10 +408,10 @@ def checkVarOverlap(id):
 def findIdType(id):
     idType = "error"
     if id in fnTable[programID]["vars"]:
-        idType = fnTable[programID]["vars"].get(id)
+        idType = fnTable[programID]["vars"][id].get("type")
     elif funcID != programID:
         if id in fnTable[funcID]["vars"]:
-            idType = fnTable[funcID]["vars"].get(id)
+            idType = fnTable[funcID]["vars"][id].get("type")
     return idType
 
 
@@ -417,6 +422,23 @@ def checkFuncOverlap():
         sys.exit()
     else:
         fnTable[funcID] = {"type": currType, "vars": {}}
+
+
+def genQuad(operator):
+    global operandStack, quadList, tempCont
+    operand2 = operandStack.pop()
+    operand1 = operandStack.pop()
+    tempType = cube[operand1.get("type")][operand2.get("type")][operator]
+
+    if tempType != "error":
+        temp = "temp" + str(tempCont)
+        tempCont += 1
+        operandStack.append({"id": temp, "type": tempType})
+        newQuad = Quad(operator, operand1, operand2, temp)
+        quadList.append(newQuad)
+    else:
+        print(f"Type mismatch caused by {operand1.get('id')} and {operand2.get('id')}")
+        sys.exit()
 
 
 # Build the parser
@@ -437,7 +459,7 @@ if __name__ == "__main__":
     for key in fnTable:
         print(f"{key} : {fnTable[key]}")
 
-    print(operandStack)
+    # print(operandStack)
 
     # mostrar quads en lista
     for quad in quadList:

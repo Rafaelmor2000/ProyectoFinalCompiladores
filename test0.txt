@@ -1,7 +1,7 @@
 program area;
 vars
 int ancho, largo;
-float alto;
+float alto[5];
 int algo;
 
 main()
@@ -10,5 +10,6 @@ float otro;
 {
     ancho = 5;
     largo = -2;
-    print("el area del rectangulo es: ", ancho * largo > 2 * (ancho + largo) & true);
+    ancho = ancho / largo * 5;
+    print("el area del rectangulo es: ", ancho * largo > -2 * (ancho + largo) & true);
 }
