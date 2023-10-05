@@ -10,5 +10,5 @@ float otro;
 {
     ancho = 5;
     largo = -2;
-    print("el area del rectangulo es: ", ancho * largo);
+    print("el area del rectangulo es: ", ancho * largo > 2 * (ancho + largo) & true);
 }

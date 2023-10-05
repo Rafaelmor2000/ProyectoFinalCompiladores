@@ -14,10 +14,8 @@ paramCounter = 0
 fnTable = {}
 cube = MyRCube.MyRCube().CUBE
 quadList = []
-testQuad = Quad("+", "A", "B", "t1")
-quadList.append(testQuad)
-for quad in quadList:
-    print(str(quad))
+operandStack = []
+tempCont = 0
 
 
 def p_program(p):
@@ -224,6 +222,13 @@ def p_expressionp(p):
     """expressionp : AND bool_exp
     | OR bool_exp
     | empty"""
+    global quadList
+    if len(p) == 3:
+        if p[1] == "&":
+            newQuad = Quad("&", p[-1], p[2], "idk")
+        elif p[1] == "|":
+            newQuad = Quad("|", p[-1], p[2], "idk")
+        quadList.append(newQuad)
 
 
 def p_bool_exp(p):
@@ -238,6 +243,21 @@ def p_bool_expp(p):
     | LEQUAL arit_exp
     | GEQUAL arit_exp
     | empty"""
+    global quadList
+    if len(p) == 3:
+        if p[1] == "<":
+            newQuad = Quad("<", p[-1], p[2], "idk")
+        elif p[1] == ">":
+            newQuad = Quad(">", p[-1], p[2], "idk")
+        elif p[1] == "==":
+            newQuad = Quad("==", p[-1], p[2], "idk")
+        elif p[1] == "<>":
+            newQuad = Quad("<>", p[-1], p[2], "idk")
+        elif p[1] == "<=":
+            newQuad = Quad(">=", p[-1], p[2], "idk")
+        elif p[1] == ">":
+            newQuad = Quad("<=", p[-1], p[2], "idk")
+        quadList.append(newQuad)
 
 
 def p_arit_exp(p):
@@ -248,6 +268,13 @@ def p_arit_expp(p):
     """arit_expp : PLUS arit_exp
     | MINUS arit_exp
     | empty"""
+    global quadList
+    if len(p) == 3:
+        if p[1] == "+":
+            newQuad = Quad("+", p[-1], p[2], "idk")
+        elif p[1] == "-":
+            newQuad = Quad("-", p[-1], p[2], "idk")
+        quadList.append(newQuad)
 
 
 def p_term(p):
@@ -259,6 +286,15 @@ def p_termp(p):
     | DIVIDE term
     | MOD term
     | empty"""
+    global quadList
+    if len(p) == 3:
+        if p[1] == "*":
+            newQuad = Quad("*", p[-1], p[2], "idk")
+        elif p[1] == "/":
+            newQuad = Quad("/", p[-1], p[2], "idk")
+        elif p[1] == "%":
+            newQuad = Quad("%", p[-1], p[2], "idk")
+        quadList.append(newQuad)
 
 
 def p_factor(p):
@@ -273,6 +309,15 @@ def p_factor(p):
 
 def p_variable(p):
     "variable : ID variablep"
+    global operandStack
+
+    varType = findIdType(p[1])
+    if varType != "error":
+        operandStack.append({"id": p[1], "type": varType})
+
+    else:
+        print(f"Variable name {p[1]} has not been declared")
+        sys.exit()
 
 
 def p_variablep(p):
@@ -281,12 +326,42 @@ def p_variablep(p):
 
 
 def p_var_cte(p):
-    """var_cte : TRUE
-    | FALSE
-    | CTE_C
-    | CTE_S
-    | CTE_I
-    | CTE_F"""
+    """var_cte : TRUE bool
+    | FALSE bool
+    | CTE_C char
+    | CTE_S string
+    | CTE_I int
+    | CTE_F float"""
+
+
+def p_bool(p):
+    "bool :"
+    global operandStack
+    operandStack.append({"id": "CTE_B", "type": "bool"})
+
+
+def p_char(p):
+    "char :"
+    global operandStack
+    operandStack.append({"id": "CTE_C", "type": "char"})
+
+
+def p_string(p):
+    "string :"
+    global operandStack
+    operandStack.append({"id": "CTE_S", "type": "string"})
+
+
+def p_int(p):
+    "int :"
+    global operandStack
+    operandStack.append({"id": "CTE_I", "type": "int"})
+
+
+def p_float(p):
+    "float :"
+    global operandStack
+    operandStack.append({"id": "CTE_F", "type": "float"})
 
 
 def p_type(p):
@@ -325,6 +400,16 @@ def checkVarOverlap(id):
         sys.exit()
 
 
+def findIdType(id):
+    idType = "error"
+    if id in fnTable[programID]["vars"]:
+        idType = fnTable[programID]["vars"].get(id)
+    elif funcID != programID:
+        if id in fnTable[funcID]["vars"]:
+            idType = fnTable[funcID]["vars"].get(id)
+    return idType
+
+
 def checkFuncOverlap():
     global fnTable
     if funcID in fnTable:
@@ -351,3 +436,9 @@ if __name__ == "__main__":
     # mostrar tabla de funciones
     for key in fnTable:
         print(f"{key} : {fnTable[key]}")
+
+    print(operandStack)
+
+    # mostrar quads en lista
+    for quad in quadList:
+        print(str(quad))
