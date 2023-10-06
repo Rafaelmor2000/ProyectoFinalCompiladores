@@ -117,8 +117,9 @@ def t_LINE_COMMENT(t):
     r"%.*"
     pass
 
+
 def t_skip_newline(t):
-    r'\n+'
+    r"\n+"
     t.lexer.lineno += t.value.count("\n")
 
 

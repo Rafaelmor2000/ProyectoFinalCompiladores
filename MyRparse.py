@@ -7,29 +7,6 @@ from Quad import *
 
 tokens = MyRlex.tokens
 
-precedence = (
-    ("left", "AND", "OR"),
-    (
-        "left",
-        "EQUALS",
-        "LTHAN",
-        "GTHAN",
-        "LEQUAL",
-        "GEQUAL",
-        "DIFFERENCE",
-    ),
-    (
-        "left",
-        "PLUS",
-        "MINUS",
-    ),
-    (
-        "left",
-        "TIMES",
-        "DIVIDE",
-        "MOD",
-    ),
-)
 
 funcID = ""
 programID = ""
@@ -338,31 +315,31 @@ def p_var_cte(p):
 def p_bool(p):
     "bool :"
     global operandStack
-    operandStack.append({"id": "CTE_B", "type": "bool"})
+    operandStack.append({"id": p[-1], "type": "bool"})
 
 
 def p_char(p):
     "char :"
     global operandStack
-    operandStack.append({"id": "CTE_C", "type": "char"})
+    operandStack.append({"id": p[-1], "type": "char"})
 
 
 def p_string(p):
     "string :"
     global operandStack
-    operandStack.append({"id": "CTE_S", "type": "string"})
+    operandStack.append({"id": p[-1], "type": "string"})
 
 
 def p_int(p):
     "int :"
     global operandStack
-    operandStack.append({"id": "CTE_I", "type": "int"})
+    operandStack.append({"id": p[-1], "type": "int"})
 
 
 def p_float(p):
     "float :"
     global operandStack
-    operandStack.append({"id": "CTE_F", "type": "float"})
+    operandStack.append({"id": p[-1], "type": "float"})
 
 
 def p_type(p):
