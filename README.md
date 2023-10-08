@@ -10,3 +10,10 @@ Avance 2:
 - Diseñar e implementar tabla de funciones y variables
 - Implementar verificación de nombres repetidos en funciones y variables
 - Modificar casos de prueba para incluir nuevas implementaciones
+
+Avance 3:
+- Crear clase para cuádruplos
+- Implementar generación de cuádruplos para las expresiones
+- Ajustes a gramática para corregir precedencia y asociatividad
+- Implementación de cubo semántico
+
