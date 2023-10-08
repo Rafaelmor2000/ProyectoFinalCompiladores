@@ -3,12 +3,13 @@ import sys
 import MyRCube
 import MyRlex
 import ply.yacc as yacc
-from Quad import *
+from Quad import Quad
 
 tokens = MyRlex.tokens
 
 precedence = (
     ("left", "AND", "OR"),
+    ("nonassoc", "LTHAN", "GTHAN", "EQUALS", "DIFFERENCE", "LEQUAL", "GEQUAL"),
     ("left", "PLUS", "MINUS"),
     ("left", "TIMES", "DIVIDE", "MOD"),
 )
@@ -224,60 +225,29 @@ def p_for(p):
 
 
 def p_expression(p):
-    "expression : bool_exp expressionp"
+    """expression : expression expressionp
+    | factor
+    | empty"""
 
 
 def p_expressionp(p):
-    """expressionp : AND bool_exp
-    | OR bool_exp
-    | empty"""
-    global quadList
-    if len(p) == 3:
-        genQuad(p[1])
+    """expressionp : AND expression
+    | OR expression
 
+    | LTHAN expression
+    | GTHAN expression
+    | EQUALS expression
+    | DIFFERENCE expression
+    | LEQUAL expression
+    | GEQUAL expression
 
-def p_bool_exp(p):
-    "bool_exp : arit_exp bool_expp"
+    | PLUS expression
+    | MINUS expression
 
-
-def p_bool_expp(p):
-    """bool_expp : LTHAN arit_exp
-    | GTHAN arit_exp
-    | EQUALS arit_exp
-    | DIFFERENCE arit_exp
-    | LEQUAL arit_exp
-    | GEQUAL arit_exp
-    | empty"""
-    global quadList
-    if len(p) == 3:
-        genQuad(p[1])
-
-
-def p_arit_exp(p):
-    "arit_exp : term arit_expp"
-
-
-def p_arit_expp(p):
-    """arit_expp : PLUS arit_exp
-    | MINUS arit_exp
-    | empty"""
-    global quadList
-    if len(p) == 3:
-        genQuad(p[1])
-
-
-def p_term(p):
-    "term : factor termp"
-
-
-def p_termp(p):
-    """termp : TIMES term
-    | DIVIDE term
-    | MOD term
-    | empty"""
-    global quadList
-    if len(p) == 3:
-        genQuad(p[1])
+    | TIMES expression
+    | DIVIDE expression
+    | MOD expression"""
+    genQuad(p[1])
 
 
 def p_factor(p):
@@ -419,7 +389,9 @@ def genQuad(operator):
         newQuad = Quad(operator, operand1, operand2, temp)
         quadList.append(newQuad)
     else:
-        print(f"Type mismatch caused by {operand1.get('id')} and {operand2.get('id')}")
+        print(
+            f"Type mismatch caused by {operator} on {operand1.get('id')} and {operand2.get('id')}"
+        )
         sys.exit()
 
 
@@ -440,8 +412,6 @@ if __name__ == "__main__":
     # mostrar tabla de funciones
     for key in fnTable:
         print(f"{key} : {fnTable[key]}")
-
-    # print(operandStack)
 
     # mostrar quads en lista
     for quad in quadList:
