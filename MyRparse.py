@@ -7,6 +7,11 @@ from Quad import *
 
 tokens = MyRlex.tokens
 
+precedence = (
+    ("left", "AND", "OR"),
+    ("left", "PLUS", "MINUS"),
+    ("left", "TIMES", "DIVIDE", "MOD"),
+)
 
 funcID = ""
 programID = ""
