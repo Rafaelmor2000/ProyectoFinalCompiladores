@@ -17,3 +17,7 @@ Avance 3:
 - Ajustes a gramática para corregir precedencia y asociatividad
 - Implementación de cubo semántico
 
+Avance 4:
+- Agregar método fill a clase Quad
+- Implementar generación de cuádruplos para read, write y condicionales
+- Modificar casos de prueba para incluir nuevas implementaciones
