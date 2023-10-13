@@ -14,6 +14,8 @@ precedence = (
     ("left", "TIMES", "DIVIDE", "MOD"),
 )
 
+EMPTY = {"id": " "}
+
 funcID = ""
 programID = ""
 currType = ""
@@ -23,6 +25,7 @@ cube = MyRCube.MyRCube().CUBE
 quadList = []
 operandStack = []
 tempCont = 0
+jumpStack = []
 
 
 def p_program(p):
@@ -92,14 +95,10 @@ def p_funcID(p):
 
 
 def p_parameters(p):
-    "parameters : LPAREN parametersp RPAREN linkParams"
+    "parameters : LPAREN parametersp RPAREN"
     global paramCounter
-    paramCounter = 0
-
-
-def p_linkParams(p):
-    "linkParams :"
     fnTable[funcID]["params"] = paramCounter
+    paramCounter = 0
 
 
 def p_parametersp(p):
@@ -154,6 +153,14 @@ def p_statementsppp(p):
 
 def p_assignment(p):
     "assignment : variable EQUAL assignmentp"
+    temp = operandStack.pop()
+    variable = operandStack.pop()
+    if temp.get("type") == variable.get("type"):
+        newQuad = Quad("=", temp, EMPTY, variable.get("id"))
+        quadList.append(newQuad)
+    else:
+        print(f"Type mismatch caused by = on {temp.get('id')} and {variable.get('id')}")
+        sys.exit()
 
 
 def p_assignmentp(p):
@@ -180,21 +187,47 @@ def p_return(p):
 
 
 def p_read(p):
-    "read : READ LPAREN variable readp RPAREN"
+    "read : READ initParams LPAREN readp RPAREN"
+    global operandStack, paramCounter
+    while paramCounter > 0:
+        temp = operandStack.pop(-paramCounter)
+        newQuad = Quad("READ", EMPTY, EMPTY, temp.get("id"))
+        quadList.append(newQuad)
+        paramCounter = paramCounter - 1
 
 
 def p_readp(p):
-    """readp : COMMA variable readp
+    "readp : variable readpp"
+    global paramCounter
+    paramCounter = paramCounter + 1
+
+
+def p_readpp(p):
+    """readpp : COMMA readp
     | empty"""
 
 
 def p_write(p):
-    "write : WRITE LPAREN writep RPAREN"
+    "write : WRITE initParams LPAREN writep RPAREN"
+    global operandStack, paramCounter
+    while paramCounter > 0:
+        temp = operandStack.pop(-paramCounter)
+        newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("id"))
+        quadList.append(newQuad)
+        paramCounter = paramCounter - 1
+
+
+def p_initParams(p):
+    "initParams :"
+    global paramCounter
+    paramCounter = 0
 
 
 def p_writep(p):
     """writep : expression writepp
-    | CTE_S writepp"""
+    | CTE_S string writepp"""
+    global paramCounter
+    paramCounter = paramCounter + 1
 
 
 def p_writepp(p):
@@ -203,12 +236,33 @@ def p_writepp(p):
 
 
 def p_condition(p):
-    "condition : IF LPAREN expression RPAREN THEN statements conditionp"
+    "condition : IF LPAREN expression RPAREN c1 THEN statements conditionp c3"
 
 
 def p_conditionp(p):
-    """conditionp : ELSE statements
+    """conditionp : c2 ELSE statements
     | empty"""
+
+
+def p_c1(p):
+    "c1 :"
+    jumpStack.append(len(quadList))
+    newQuad = Quad("GOTOF", operandStack.pop(), EMPTY, EMPTY)
+    quadList.append(newQuad)
+
+
+def p_c2(p):
+    "c2 :"
+    quadList[jumpStack.pop()].fill(len(quadList) + 1)
+    newQuad = Quad("GOTO", EMPTY, EMPTY, EMPTY)
+
+    jumpStack.append(len(quadList))
+    quadList.append(newQuad)
+
+
+def p_c3(p):
+    "c3 :"
+    quadList[jumpStack.pop()].fill(len(quadList))
 
 
 def p_loop(p):
@@ -338,6 +392,11 @@ def p_error(p):
     sys.exit()
 
 
+# def p_checkpoint(p):
+#     "checkpoint :"
+#     jumpStack.append(len(quadList))
+
+
 def checkVarOverlap(id, arrSize):
     global fnTable
     overlap = False
@@ -377,7 +436,7 @@ def checkFuncOverlap():
 
 
 def genQuad(operator):
-    global operandStack, quadList, tempCont
+    global operandStack, quadList, tempCont, currType
     operand2 = operandStack.pop()
     operand1 = operandStack.pop()
     tempType = cube[operand1.get("type")][operand2.get("type")][operator]
@@ -414,5 +473,13 @@ if __name__ == "__main__":
         print(f"{key} : {fnTable[key]}")
 
     # mostrar quads en lista
+    cont = 0
     for quad in quadList:
-        print(str(quad))
+        print(cont, str(quad))
+        cont = cont + 1
+
+    for operand in operandStack:
+        print(str(operand))
+
+    for jump in jumpStack:
+        print(str(jump))

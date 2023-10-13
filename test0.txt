@@ -9,6 +9,7 @@ vars
 float otro;
 {
     ancho = 5;
+    read(otro, largo);
     largo = 1 * 2 * 3;
-    print("el area del rectangulo es: ", ancho * largo > -2 * (ancho + largo) & true);
+    write("el area del rectangulo es: ", ancho * largo > -2 * (ancho + largo) & true);
 }

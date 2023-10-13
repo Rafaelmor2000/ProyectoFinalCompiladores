@@ -5,5 +5,8 @@ class Quad:
         self.operand2 = operand2
         self.temp = temp
 
+    def fill(self, temp) -> None:
+        self.temp = temp
+
     def __str__(self):
         return f"[{self.operator}, {self.operand1.get('id')}, {self.operand2.get('id')}, {self.temp}]"
