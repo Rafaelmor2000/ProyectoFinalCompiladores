@@ -30,6 +30,8 @@ jumpStack = []
 
 def p_program(p):
     "program : PROGRAM ID init SEMICOLON vars programp main"
+    newQuad = Quad("DONE", EMPTY, EMPTY, " ")
+    quadList.append(newQuad)
 
 
 def p_init(p):
