@@ -1,8 +1,8 @@
 program test;
 vars
 int cantidad;
-function void cuadrado(int cantidad){
-    print(ancho * ancho);
+function void cuadrado(int cant){
+    print(cant * cant);
 }
 main()
 vars
