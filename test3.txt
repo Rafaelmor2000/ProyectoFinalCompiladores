@@ -1,7 +1,7 @@
 program area;
 vars
 int ancho, largo;
-function int cuadrado(){
+function void cuadrado(){
     print(ancho * ancho);
 }
 
