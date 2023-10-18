@@ -11,7 +11,7 @@ float ancho, largo, area;
     ancho = 5.8;
     largo = -2.69;
     area = ancho/largo;
-    if (largo > 0) then {
+    if (largo) then {
     }
     else {
         if(largo < 1) then {

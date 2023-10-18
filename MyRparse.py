@@ -249,8 +249,13 @@ def p_conditionp(p):
 def p_c1(p):
     "c1 :"
     jumpStack.append(len(quadList))
-    newQuad = Quad("GOTOF", operandStack.pop(), EMPTY, EMPTY)
-    quadList.append(newQuad)
+    aux = operandStack.pop()
+    if(aux.get("type") == "bool"):
+        newQuad = Quad("GOTOF", aux, EMPTY, EMPTY)
+        quadList.append(newQuad)
+    else:
+        print(f"expression in line {p.lineno!r} needs to result in boolean type")
+        sys.exit()
 
 
 def p_c2(p):
