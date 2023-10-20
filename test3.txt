@@ -23,5 +23,7 @@ float altura;
 {
     ancho = 5;
     largo = -2;
-    write("el area del rectangulo es: ", ancho * largo);
+    while(largo > -2) do {
+        write("el area del rectangulo es: ", ancho * largo);
+    }
 }

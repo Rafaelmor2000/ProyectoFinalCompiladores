@@ -7,11 +7,11 @@ float ancho, largo, area;
     ancho = 5.8;
     largo = -2.69 - 5;
     area = ancho/largo;
-    if(ancho>largo) then {
+    while (ancho>largo) do {
+        while(ancho<largo) do{
+            write("world");
+        }
         write("hello");
-    }
-    else{
-        write("there");
     }
     write("General Kenobi");
     for i = 1 to 5 do {}

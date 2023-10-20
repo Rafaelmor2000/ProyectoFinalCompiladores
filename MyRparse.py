@@ -277,8 +277,33 @@ def p_loop(p):
     | for"""
 
 
+def p_checkpoint(p):
+    "checkpoint :"
+    jumpStack.append(len(quadList))
+
+
 def p_while(p):
-    "while : WHILE LPAREN expression RPAREN DO statements"
+    "while : WHILE checkpoint LPAREN expression w1 DO statements w2"
+
+
+def p_w1(p):
+    "w1 : RPAREN"
+    aux = operandStack.pop()
+    if aux.get("type") == "bool":
+        newQuad = Quad("GOTOF", aux, EMPTY, EMPTY)
+        jumpStack.append(len(quadList))
+        quadList.append(newQuad)
+    else:
+        print(f"expression in line {p.lineno(1)!r} needs to result in boolean type")
+        sys.exit()
+
+
+def p_w2(p):
+    "w2 :"
+    aux = jumpStack.pop()
+    newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
+    quadList.append(newQuad)
+    quadList[aux].fill(len(quadList))
 
 
 def p_for(p):
@@ -397,11 +422,6 @@ def p_error(p):
     else:
         print(f"Syntax error at {p.value!r} in line {p.lineno!r}")
     sys.exit()
-
-
-# def p_checkpoint(p):
-#     "checkpoint :"
-#     jumpStack.append(len(quadList))
 
 
 def checkVarOverlap(id, arrSize):
