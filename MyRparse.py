@@ -238,7 +238,7 @@ def p_writepp(p):
 
 
 def p_condition(p):
-    "condition : IF LPAREN expression RPAREN c1 THEN statements conditionp c3"
+    "condition : IF LPAREN expression c1 THEN statements conditionp c3"
 
 
 def p_conditionp(p):
@@ -247,14 +247,14 @@ def p_conditionp(p):
 
 
 def p_c1(p):
-    "c1 :"
+    "c1 : RPAREN"
     jumpStack.append(len(quadList))
     aux = operandStack.pop()
-    if(aux.get("type") == "bool"):
+    if aux.get("type") == "bool":
         newQuad = Quad("GOTOF", aux, EMPTY, EMPTY)
         quadList.append(newQuad)
     else:
-        print(f"expression in line {p.lineno!r} needs to result in boolean type")
+        print(f"expression in line {p.lineno(1)!r} needs to result in boolean type")
         sys.exit()
 
 
