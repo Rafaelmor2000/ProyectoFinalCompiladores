@@ -1,18 +1,17 @@
 program test;
 main()
 vars
+int i,j;
 float ancho, largo, area;
 {
     %this is a comment
-    ancho = 5.8;
+    ancho = 5.0;
     largo = -2.69 - 5;
     area = ancho/largo;
-    while (ancho>largo) do {
-        while(ancho<largo) do{
-            write("world");
+    for i = 1 to 5 do {
+        for j = 1 to 5 do{
+            write("General Kenobi");
         }
-        write("hello");
+        write("the fun begins");
     }
-    write("General Kenobi");
-    for i = 1 to 5 do {}
 }

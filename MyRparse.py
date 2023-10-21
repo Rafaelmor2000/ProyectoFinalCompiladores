@@ -155,6 +155,10 @@ def p_statementsppp(p):
 
 def p_assignment(p):
     "assignment : variable EQUAL assignmentp"
+    assignment()
+
+
+def assignment():
     temp = operandStack.pop()
     variable = operandStack.pop()
     if temp.get("type") == variable.get("type"):
@@ -277,17 +281,17 @@ def p_loop(p):
     | for"""
 
 
-def p_checkpoint(p):
-    "checkpoint :"
-    jumpStack.append(len(quadList))
-
-
 def p_while(p):
-    "while : WHILE checkpoint LPAREN expression w1 DO statements w2"
+    "while : WHILE w1 LPAREN expression w2 DO statements w3"
 
 
 def p_w1(p):
-    "w1 : RPAREN"
+    "w1 :"
+    jumpStack.append(len(quadList))
+
+
+def p_w2(p):
+    "w2 : RPAREN"
     aux = operandStack.pop()
     if aux.get("type") == "bool":
         newQuad = Quad("GOTOF", aux, EMPTY, EMPTY)
@@ -298,8 +302,8 @@ def p_w1(p):
         sys.exit()
 
 
-def p_w2(p):
-    "w2 :"
+def p_w3(p):
+    "w3 :"
     aux = jumpStack.pop()
     newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
     quadList.append(newQuad)
@@ -307,7 +311,58 @@ def p_w2(p):
 
 
 def p_for(p):
-    "for : FOR ID EQUAL expression TO expression DO statements"
+    "for : FOR ID EQUAL expression f1 expression f2 statements f3"
+
+
+def p_f1(p):
+    "f1 : TO"
+    aux = operandStack.pop()
+    if aux.get("type") == "int":
+        var = findIdType(p[-3])
+        operandStack.append(aux)
+        assignment()
+        operandStack.append(var)
+        operandStack.append(aux)
+        jumpStack.append(len(quadList))
+    else:
+        print(
+            f"first expression in line {p.lineno(1)!r} needs to result in integer type"
+        )
+        sys.exit()
+
+
+def p_f2(p):
+    "f2 : DO"
+    global tempCont
+    exp2 = operandStack.pop()
+    exp1 = operandStack.pop()
+    var = operandStack.pop()
+    if exp2.get("type") == "int":
+        # falta agregar implementación para evaluar si exp1 es mayor a exp2 en ejecución
+        operandStack.append(var)
+        operandStack.append(exp2)
+        genQuad("<")
+        jumpStack.append(len(quadList))
+        newQuad = Quad("GOTOF", operandStack.pop(), EMPTY, " ")
+        quadList.append(newQuad)
+        operandStack.append(var)
+
+    else:
+        print(
+            f"second expression in line {p.lineno(1)!r} needs to result in integer type"
+        )
+        sys.exit()
+
+
+def p_f3(p):
+    "f3 :"
+    var = operandStack.pop()
+    aux = jumpStack.pop()
+    newQuad = Quad("+", var, {"id": 1, "type": "int"}, var.get("id"))
+    quadList.append(newQuad)
+    newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
+    quadList.append(newQuad)
+    quadList[aux].fill(len(quadList))
 
 
 def p_expression(p):
@@ -350,13 +405,7 @@ def p_variable(p):
     "variable : ID variablep"
     global operandStack
 
-    varType = findIdType(p[1])
-    if varType != "error":
-        operandStack.append({"id": p[1], "type": varType})
-
-    else:
-        print(f"Variable name {p[1]} has not been declared")
-        sys.exit()
+    findIdType(p[1])
 
 
 def p_variablep(p):
@@ -450,7 +499,14 @@ def findIdType(id):
     elif funcID != programID:
         if id in fnTable[funcID]["vars"]:
             idType = fnTable[funcID]["vars"][id].get("type")
-    return idType
+
+    if idType != "error":
+        operandStack.append({"id": id, "type": idType})
+        return {"id": id, "type": idType}
+
+    else:
+        print(f"Variable name {id} has not been declared")
+        sys.exit()
 
 
 def checkFuncOverlap():
