@@ -21,3 +21,8 @@ Avance 4:
 - Agregar método fill a clase Quad
 - Implementar generación de cuádruplos para read, write y condicionales
 - Modificar casos de prueba para incluir nuevas implementaciones
+
+Avance 5:
+- Implementar generación de cuádruplos para while y for
+- Agregar evaluación del tipo bool a los condicionales
+- Modificar casos de prueba para incluir nuevas implementaciones
