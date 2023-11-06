@@ -40,6 +40,9 @@ def p_init(p):
     programID = p[-1]
     funcID = programID
     fnTable[programID] = {"type": "void", "vars": {}}
+    newQuad = Quad("GOTO", EMPTY, EMPTY, EMPTY)
+    quadList.append(newQuad)
+    jumpStack.append(0)
 
 
 def p_programp(p):
@@ -79,6 +82,9 @@ def p_varspppp(p):
 def p_function(p):
     """function : FUNCTION functionp ID funcID parameters vars statements
     | empty"""
+    global paramCounter
+    newQuad = Quad("ENDFUNC", EMPTY, EMPTY, " ")
+    quadList.append(newQuad)
 
 
 def p_functionp(p):
@@ -100,7 +106,11 @@ def p_parameters(p):
     "parameters : LPAREN parametersp RPAREN"
     global paramCounter
     fnTable[funcID]["params"] = paramCounter
-    paramCounter = 0
+
+    while paramCounter > 0:
+        temp = operandStack.pop()
+        checkVarOverlap(temp, 0)
+        paramCounter = paramCounter - 1
 
 
 def p_parametersp(p):
@@ -108,9 +118,8 @@ def p_parametersp(p):
     | empty"""
     if len(p) == 4:
         global paramCounter
-        varID = p[2]
+        operandStack.append(p[2])
         paramCounter += 1
-        checkVarOverlap(varID, 0)
 
 
 def p_parameterspp(p):
@@ -119,7 +128,7 @@ def p_parameterspp(p):
 
 
 def p_main(p):
-    "main : MAIN mainID LPAREN RPAREN vars statements"
+    "main : MAIN mainID LPAREN RPAREN statements"
 
 
 def p_mainID(p):
@@ -127,7 +136,8 @@ def p_mainID(p):
     global funcID, currType
     funcID = "main"
     currType = "void"
-    fnTable[funcID] = {"type": currType, "vars": {}}
+    fnTable[funcID] = {"type": currType}
+    quadList[jumpStack.pop()].fill(len(quadList))
 
 
 def p_statements(p):
@@ -175,12 +185,42 @@ def p_assignmentp(p):
 
 
 def p_call(p):
-    "call : ID LPAREN callp RPAREN"
+    "call : ID initParams LPAREN callp RPAREN"
+    global paramCounter, tempCont
+    funcID = p[1]
+    currType, dir, params = findFunc(funcID)
+
+    if params != paramCounter:
+        print(f"Missing parameters in call to {funcID}")
+        sys.exit()
+
+    while paramCounter > 0:
+        newQuad = Quad(
+            "PARAM", operandStack.pop(-paramCounter), EMPTY, params - paramCounter + 1
+        )
+        quadList.append(newQuad)
+        paramCounter -= 1
+
+    newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
+    quadList.append(newQuad)
+
+    if currType != "void":
+        temp = "temp" + str(tempCont)
+        tempCont += 1
+        operandStack.append({"id": temp, "type": currType, "dir": None})
+        aux = fnTable[programID]["vars"][funcID]
+        operandStack.append(
+            {"id": funcID, "type": aux.get("type"), "dir": aux.get("dir")}
+        )
+        assignment()
+        operandStack.append({"id": temp, "type": currType, "dir": None})
 
 
 def p_callp(p):
     """callp : expression callpp
     | empty"""
+    global paramCounter
+    paramCounter += 1
 
 
 def p_callpp(p):
@@ -190,6 +230,16 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
+    if p[3] != "void":
+        aux = operandStack.pop()
+        operandStack.append(
+            {"id": funcID, "type": fnTable[funcID].get("type"), "dir": None}
+        )
+        operandStack.append(aux)
+        assignment()
+    elif fnTable[funcID].get("type") != "void":
+        print(f"Type mismatch on return for function {funcID}")
+        sys.exit()
 
 
 def p_read(p):
@@ -369,6 +419,7 @@ def p_expression(p):
     """expression : expression expressionp
     | factor
     | empty"""
+    p[0] = p[1]
 
 
 def p_expressionp(p):
@@ -462,6 +513,7 @@ def p_type(p):
 
 def p_empty(p):
     "empty :"
+    p[0] = "void"
     pass
 
 
@@ -493,6 +545,7 @@ def checkVarOverlap(id, arrSize):
 
 
 def findIdType(id):
+    global operandStack
     idType = "error"
     if id in fnTable[programID]["vars"]:
         idType = fnTable[programID]["vars"][id].get("type")
@@ -502,7 +555,7 @@ def findIdType(id):
 
     if idType != "error":
         operandStack.append({"id": id, "type": idType})
-        return {"id": id, "type": idType}
+        return fnTable[funcID].get("dir")
 
     else:
         print(f"Variable name {id} has not been declared")
@@ -515,7 +568,27 @@ def checkFuncOverlap():
         print(f"Function name {funcID} has been declared elsewhere")
         sys.exit()
     else:
-        fnTable[funcID] = {"type": currType, "vars": {}}
+        fnTable[funcID] = {"type": currType, "dir": len(quadList), "vars": {}}
+        if currType != "void":
+            fnTable[programID]["vars"][funcID] = {
+                "type": currType,
+                "arrSize": 0,
+                "dir": None,
+            }
+
+
+def findFunc(func):
+    global funcID
+    if func in fnTable:
+        funcID = func
+        return (
+            fnTable[funcID].get("type"),
+            fnTable[funcID].get("dir"),
+            fnTable[funcID].get("params"),
+        )
+    else:
+        print(f"Function {func} has not been declared")
+        sys.exit()
 
 
 def genQuad(operator):
@@ -527,7 +600,7 @@ def genQuad(operator):
     if tempType != "error":
         temp = "temp" + str(tempCont)
         tempCont += 1
-        operandStack.append({"id": temp, "type": tempType})
+        operandStack.append({"id": temp, "type": tempType, "dir": None})
         newQuad = Quad(operator, operand1, operand2, temp)
         quadList.append(newQuad)
     else:

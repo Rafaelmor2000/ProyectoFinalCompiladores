@@ -1,11 +1,11 @@
 program area;
 vars
-int ancho, largo;
+float ancho, largo;
 function void cuadrado(){
     write(ancho * ancho);
 }
 
-function int triangulo(float grosor, float altura)
+function float triangulo(float grosor, float altura)
 vars
 float otro, area;
 {
@@ -18,12 +18,11 @@ function void trapecio(float anchoArriba, float anchoAbajo, float altura){
 }
 
 main()
-vars
-float altura;
 {
-    ancho = 5;
-    largo = -2;
+    ancho = 5.0;
+    largo = -2.0;
     while(largo > -2) do {
+        largo = triangulo(ancho, largo);
         write("el area del rectangulo es: ", ancho * largo);
     }
 }
