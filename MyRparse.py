@@ -3,6 +3,9 @@ import sys
 import MyRCube
 import MyRlex
 import ply.yacc as yacc
+from ConstantMemory import *
+from GlobalMemory import *
+from LocalMemory import *
 from Quad import Quad
 
 tokens = MyRlex.tokens
@@ -21,11 +24,17 @@ programID = ""
 currType = ""
 paramCounter = 0
 fnTable = {}
+cnTable = {}
 cube = MyRCube.MyRCube().CUBE
 quadList = []
 operandStack = []
 tempCont = 0
 jumpStack = []
+
+# memory
+gMemory = GlobalMemory()
+lMemory = LocalMemory()
+cMemory = ConstantMemory()
 
 
 def p_program(p):
@@ -104,12 +113,13 @@ def p_funcID(p):
 
 def p_parameters(p):
     "parameters : LPAREN parametersp RPAREN"
-    global paramCounter
+    global paramCounter, currType
     fnTable[funcID]["params"] = paramCounter
 
     while paramCounter > 0:
         temp = operandStack.pop()
-        checkVarOverlap(temp, 0)
+        currType = temp[1]
+        checkVarOverlap(temp[0], 0)
         paramCounter = paramCounter - 1
 
 
@@ -118,7 +128,7 @@ def p_parametersp(p):
     | empty"""
     if len(p) == 4:
         global paramCounter
-        operandStack.append(p[2])
+        operandStack.append([p[2], p[1]])
         paramCounter += 1
 
 
@@ -133,10 +143,8 @@ def p_main(p):
 
 def p_mainID(p):
     "mainID :"
-    global funcID, currType
-    funcID = "main"
-    currType = "void"
-    fnTable[funcID] = {"type": currType}
+    global funcID
+    funcID = programID
     quadList[jumpStack.pop()].fill(len(quadList))
 
 
@@ -194,12 +202,25 @@ def p_call(p):
         print(f"Missing parameters in call to {funcID}")
         sys.exit()
 
+    keys = list(fnTable[funcID]["vars"])
     while paramCounter > 0:
-        newQuad = Quad(
-            "PARAM", operandStack.pop(-paramCounter), EMPTY, params - paramCounter + 1
-        )
-        quadList.append(newQuad)
-        paramCounter -= 1
+        parameter = operandStack.pop(-paramCounter)
+        key = keys[params - paramCounter]
+
+        if parameter.get("type") == fnTable[funcID]["vars"][key].get("type"):
+            newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter + 1)
+            quadList.append(newQuad)
+            paramCounter -= 1
+        else:
+            print(
+                fnTable,
+                parameter,
+                parameter.get("type"),
+                key,
+                fnTable[funcID]["vars"][key].get("type"),
+            )
+            print(f"Parameter types do not match call to {funcID}")
+            sys.exit()
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
     quadList.append(newQuad)
@@ -388,7 +409,6 @@ def p_f2(p):
     exp1 = operandStack.pop()
     var = operandStack.pop()
     if exp2.get("type") == "int":
-        # falta agregar implementación para evaluar si exp1 es mayor a exp2 en ejecución
         operandStack.append(var)
         operandStack.append(exp2)
         genQuad("<")
@@ -407,6 +427,7 @@ def p_f2(p):
 def p_f3(p):
     "f3 :"
     var = operandStack.pop()
+    print(var)
     aux = jumpStack.pop()
     newQuad = Quad("+", var, {"id": 1, "type": "int"}, var.get("id"))
     quadList.append(newQuad)
@@ -417,8 +438,7 @@ def p_f3(p):
 
 def p_expression(p):
     """expression : expression expressionp
-    | factor
-    | empty"""
+    | factor"""
     p[0] = p[1]
 
 
@@ -476,31 +496,46 @@ def p_var_cte(p):
 def p_bool(p):
     "bool :"
     global operandStack
-    operandStack.append({"id": p[-1], "type": "bool"})
+    cn = {"id": p[-1], "type": "bool"}
+    dir = checkConstOverlap(cn)
+    cn["dir"] = dir
+    operandStack.append(cn)
 
 
 def p_char(p):
     "char :"
     global operandStack
-    operandStack.append({"id": p[-1], "type": "char"})
+    cn = {"id": p[-1], "type": "char"}
+    dir = checkConstOverlap(cn)
+    cn["dir"] = dir
+    operandStack.append(cn)
 
 
 def p_string(p):
     "string :"
     global operandStack
-    operandStack.append({"id": p[-1], "type": "string"})
+    cn = {"id": p[-1], "type": "string"}
+    dir = checkConstOverlap(cn)
+    cn["dir"] = dir
+    operandStack.append(cn)
 
 
 def p_int(p):
     "int :"
     global operandStack
-    operandStack.append({"id": p[-1], "type": "int"})
+    cn = {"id": p[-1], "type": "int"}
+    dir = checkConstOverlap(cn)
+    cn["dir"] = dir
+    operandStack.append(cn)
 
 
 def p_float(p):
     "float :"
     global operandStack
-    operandStack.append({"id": p[-1], "type": "float"})
+    cn = {"id": p[-1], "type": "float"}
+    dir = checkConstOverlap(cn)
+    cn["dir"] = dir
+    operandStack.append(cn)
 
 
 def p_type(p):
@@ -509,6 +544,7 @@ def p_type(p):
     | CHAR"""
     global currType
     currType = p[1]
+    p[0] = p[1]
 
 
 def p_empty(p):
@@ -533,12 +569,16 @@ def checkVarOverlap(id, arrSize):
     if funcID != programID:
         if id in fnTable[funcID]["vars"]:
             overlap = True
+
     if not overlap:
-        fnTable[funcID]["vars"][id] = {
-            "type": currType,
-            "arrSize": arrSize,
-            "dir": None,
-        }
+        var = {"type": currType, "arrSize": arrSize}
+        if funcID == programID:
+            dir = gMemory.malloc(var)
+        else:
+            dir = lMemory.malloc(var)
+        var["dir"] = dir
+
+        fnTable[funcID]["vars"][id] = var
     else:
         print(f"Variable name {id} has been declared elsewhere")
         sys.exit()
@@ -547,15 +587,23 @@ def checkVarOverlap(id, arrSize):
 def findIdType(id):
     global operandStack
     idType = "error"
+    local = False
     if id in fnTable[programID]["vars"]:
         idType = fnTable[programID]["vars"][id].get("type")
+        dir = fnTable[programID]["vars"][id].get("dir")
     elif funcID != programID:
         if id in fnTable[funcID]["vars"]:
             idType = fnTable[funcID]["vars"][id].get("type")
+            dir = fnTable[funcID]["vars"][id].get("dir")
+            local = True
 
     if idType != "error":
-        operandStack.append({"id": id, "type": idType})
-        return fnTable[funcID].get("dir")
+        var = {"id": id, "type": idType, "dir": dir}
+        operandStack.append(var)
+        if local:
+            return fnTable[funcID]["vars"][id]
+        else:
+            return fnTable[programID]["vars"][id]
 
     else:
         print(f"Variable name {id} has not been declared")
@@ -589,6 +637,18 @@ def findFunc(func):
     else:
         print(f"Function {func} has not been declared")
         sys.exit()
+
+
+def checkConstOverlap(cn):
+    global cnTable
+    id = cn.get("id")
+    if id not in cnTable:
+        dir = cMemory.malloc(cn)
+        cnTable[id] = {"type": cn.get("type"), "dir": dir}
+    else:
+        dir = cnTable[id].get("dir")
+
+    return dir
 
 
 def genQuad(operator):
@@ -627,6 +687,9 @@ if __name__ == "__main__":
     # mostrar tabla de funciones
     for key in fnTable:
         print(f"{key} : {fnTable[key]}")
+
+    # mostrar tabla de constantes
+    print(cnTable)
 
     # mostrar quads en lista
     cont = 0
