@@ -149,6 +149,7 @@ def p_mainID(p):
     "mainID :"
     global funcID
     funcID = programID
+    print(funcID)
     quadList[jumpStack.pop()].fill(len(quadList))
 
 
@@ -198,6 +199,7 @@ def p_assignmentp(p):
 
 def p_call(p):
     "call : ID initParams LPAREN callp RPAREN"
+    print(funcID)
     global paramCounter, tempCont
     id = p[1]
     currType, dir, params = findFunc(id)
@@ -212,7 +214,11 @@ def p_call(p):
         key = keys[params - paramCounter]
 
         if parameter.get("type") == fnTable[id]["vars"][key].get("type"):
-            newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter + 1)
+            # newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter + 1)
+            newQuad = Quad(
+                "PARAM", parameter, EMPTY, fnTable[id]["vars"][key].get("dir")
+            )
+
             quadList.append(newQuad)
             paramCounter -= 1
         else:
@@ -245,6 +251,7 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
+    print(funcID)
     aux = operandStack.pop()
     if programID == funcID:
         print(f"Cannot have return on function main")
@@ -632,11 +639,10 @@ def checkFuncOverlap():
 def findFunc(func):
     global funcID
     if func in fnTable:
-        funcID = func
         return (
-            fnTable[funcID].get("type"),
-            fnTable[funcID].get("dir"),
-            fnTable[funcID].get("params"),
+            fnTable[func].get("type"),
+            fnTable[func].get("dir"),
+            fnTable[func].get("params"),
         )
     else:
         print(f"Function {func} has not been declared")

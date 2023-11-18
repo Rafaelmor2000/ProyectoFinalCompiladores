@@ -26,5 +26,4 @@ main()
         largo = triangulo(ancho, largo);
         write("el area del rectangulo es: ", ancho * largo);
     }
-    return(largo);
 }
