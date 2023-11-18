@@ -390,7 +390,17 @@ def p_w3(p):
 
 
 def p_for(p):
-    "for : FOR ID EQUAL expression f1 expression f2 statements f3"
+    "for : FOR ID EQUAL expression f1 expression f2 statements"
+    var = operandStack.pop()
+    print(var)
+    aux = jumpStack.pop()
+    checkConstOverlap({"type": "int", "id": 1})
+    newQuad = Quad("+", var, operandStack.pop(), var.get("dir"))
+
+    quadList.append(newQuad)
+    newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
+    quadList.append(newQuad)
+    quadList[aux].fill(len(quadList))
 
 
 def p_f1(p):
@@ -432,21 +442,6 @@ def p_f2(p):
         sys.exit()
 
 
-def p_f3(p):
-    "f3 :"
-    var = operandStack.pop()
-    print(var)
-    aux = jumpStack.pop()
-    newQuad = Quad(
-        "+", var, {"dir": checkConstOverlap({"type": int, "id": 1})}, var.get("dir")
-    )
-
-    quadList.append(newQuad)
-    newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
-    quadList.append(newQuad)
-    quadList[aux].fill(len(quadList))
-
-
 def p_expression(p):
     """expression : expression expressionp
     | factor"""
@@ -485,14 +480,27 @@ def p_factor(p):
 
 def p_variable(p):
     "variable : ID variablep"
-    global operandStack
-
-    findIdType(p[1])
 
 
 def p_variablep(p):
     """variablep : LBRACKET expression RBRACKET
     | empty"""
+    findIdType(p[-1])
+    # if len(p) == 4:
+    #     global quadList
+
+    #     var = operandStack.pop()
+    #     exp = operandStack.pop()
+    #     print(var, exp)
+    #     if exp.get("type") != "int":
+    #         print(
+    #             f"Expression for array in line {p.lineno(1)!r} needs to result in integer type"
+    #         )
+    #         sys.exit()
+    #     else:
+    #         newQuad = Quad("VER", exp, EMPTY, f"0-{var.get('arrSize')-1}")
+    #         quadList.append(newQuad)
+    #         operandStack.append(checkConstOverlap({"type": "int", "id": var.get("dir")})
 
 
 def p_var_cte(p):
@@ -509,8 +517,8 @@ def p_bool(p):
     global operandStack
     cn = {"id": p[-1], "type": "bool"}
     dir = checkConstOverlap(cn)
-    cn["dir"] = dir
-    operandStack.append(cn)
+    # cn["dir"] = dir
+    # operandStack.append(cn)
 
 
 def p_char(p):
@@ -518,8 +526,8 @@ def p_char(p):
     global operandStack
     cn = {"id": p[-1], "type": "char"}
     dir = checkConstOverlap(cn)
-    cn["dir"] = dir
-    operandStack.append(cn)
+    # cn["dir"] = dir
+    # operandStack.append(cn)
 
 
 def p_string(p):
@@ -527,8 +535,8 @@ def p_string(p):
     global operandStack
     cn = {"id": p[-1], "type": "string"}
     dir = checkConstOverlap(cn)
-    cn["dir"] = dir
-    operandStack.append(cn)
+    # cn["dir"] = dir
+    # operandStack.append(cn)
 
 
 def p_int(p):
@@ -536,8 +544,8 @@ def p_int(p):
     global operandStack
     cn = {"id": p[-1], "type": "int"}
     dir = checkConstOverlap(cn)
-    cn["dir"] = dir
-    operandStack.append(cn)
+    # cn["dir"] = dir
+    # operandStack.append(cn)
 
 
 def p_float(p):
@@ -545,8 +553,8 @@ def p_float(p):
     global operandStack
     cn = {"id": p[-1], "type": "float"}
     dir = checkConstOverlap(cn)
-    cn["dir"] = dir
-    operandStack.append(cn)
+    # cn["dir"] = dir
+    # operandStack.append(cn)
 
 
 def p_type(p):
@@ -602,14 +610,16 @@ def findIdType(id):
     if id in fnTable[programID]["vars"]:
         idType = fnTable[programID]["vars"][id].get("type")
         dir = fnTable[programID]["vars"][id].get("dir")
+        arrSize = fnTable[programID]["vars"][id].get("arrSize")
     elif funcID != programID:
         if id in fnTable[funcID]["vars"]:
             idType = fnTable[funcID]["vars"][id].get("type")
             dir = fnTable[funcID]["vars"][id].get("dir")
+            arrSize = fnTable[funcID]["vars"][id].get("arrSize")
             local = True
 
     if idType != "error":
-        var = {"id": id, "type": idType, "dir": dir}
+        var = {"id": id, "arrSize": arrSize, "type": idType, "dir": dir}
         operandStack.append(var)
         if local:
             return fnTable[funcID]["vars"][id]
@@ -657,7 +667,9 @@ def checkConstOverlap(cn):
     else:
         dir = cnTable[id].get("dir")
 
-    return dir
+    cn["dir"] = dir
+    operandStack.append(cn)
+    # return dir
 
 
 def genQuad(operator):
