@@ -1,14 +1,16 @@
 program test;
-main()
 vars
-int i,j;
+int i, j;
+char h;
 float ancho, largo, area;
+
+main()
 {
     %this is a comment
     ancho = 5.0;
     largo = -2.69 - 5;
     area = ancho/largo;
-    for i = 1 to 5 do {
+    for i = 5 to 1 do {
         for j = 1 to 5 do{
             write("General Kenobi");
         }

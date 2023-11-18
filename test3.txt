@@ -1,6 +1,7 @@
 program area;
 vars
 float ancho, largo;
+
 function void cuadrado(){
     write(ancho * ancho);
 }
@@ -25,4 +26,5 @@ main()
         largo = triangulo(ancho, largo);
         write("el area del rectangulo es: ", ancho * largo);
     }
+    return(largo);
 }

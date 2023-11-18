@@ -1,16 +1,19 @@
 program test;
 vars
 int cantidad;
+int ancho;
+float largo, area;
 function void cuadrado(int cant){
-    print(cant * cant);
+    write(cant * cant);
+}
+function float rectangulo(int grosor, float alto){
+    return(alto);
 }
 main()
-vars
-float ancho, largo, area;
 {
-    ancho = 5.8;
+    ancho = 5;
     largo = -2.69;
-    area = ancho/largo;
+    area = rectangulo(ancho, largo);
     if (largo>1) then {
     }
     else {

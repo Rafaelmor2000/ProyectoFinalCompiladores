@@ -7,6 +7,7 @@ from ConstantMemory import *
 from GlobalMemory import *
 from LocalMemory import *
 from Quad import Quad
+from TempMemory import *
 
 tokens = MyRlex.tokens
 
@@ -35,6 +36,7 @@ jumpStack = []
 gMemory = GlobalMemory()
 lMemory = LocalMemory()
 cMemory = ConstantMemory()
+tMemory = TempMemory()
 
 
 def p_program(p):
@@ -94,6 +96,8 @@ def p_function(p):
     global paramCounter
     newQuad = Quad("ENDFUNC", EMPTY, EMPTY, " ")
     quadList.append(newQuad)
+    lMemory.clear()
+    tMemory.clear()
 
 
 def p_functionp(p):
@@ -180,7 +184,7 @@ def assignment():
     temp = operandStack.pop()
     variable = operandStack.pop()
     if temp.get("type") == variable.get("type"):
-        newQuad = Quad("=", temp, EMPTY, variable.get("id"))
+        newQuad = Quad("=", temp, EMPTY, variable.get("dir"))
         quadList.append(newQuad)
     else:
         print(f"Type mismatch caused by = on {temp.get('id')} and {variable.get('id')}")
@@ -195,46 +199,36 @@ def p_assignmentp(p):
 def p_call(p):
     "call : ID initParams LPAREN callp RPAREN"
     global paramCounter, tempCont
-    funcID = p[1]
-    currType, dir, params = findFunc(funcID)
+    id = p[1]
+    currType, dir, params = findFunc(id)
 
     if params != paramCounter:
-        print(f"Missing parameters in call to {funcID}")
+        print(f"Missing parameters in call to {id}")
         sys.exit()
 
-    keys = list(fnTable[funcID]["vars"])
+    keys = list(fnTable[id]["vars"])
     while paramCounter > 0:
         parameter = operandStack.pop(-paramCounter)
         key = keys[params - paramCounter]
 
-        if parameter.get("type") == fnTable[funcID]["vars"][key].get("type"):
+        if parameter.get("type") == fnTable[id]["vars"][key].get("type"):
             newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter + 1)
             quadList.append(newQuad)
             paramCounter -= 1
         else:
-            print(
-                fnTable,
-                parameter,
-                parameter.get("type"),
-                key,
-                fnTable[funcID]["vars"][key].get("type"),
-            )
-            print(f"Parameter types do not match call to {funcID}")
+            print(f"Parameter types do not match call to {id}")
             sys.exit()
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
     quadList.append(newQuad)
 
     if currType != "void":
-        temp = "temp" + str(tempCont)
-        tempCont += 1
-        operandStack.append({"id": temp, "type": currType, "dir": None})
-        aux = fnTable[programID]["vars"][funcID]
-        operandStack.append(
-            {"id": funcID, "type": aux.get("type"), "dir": aux.get("dir")}
-        )
+        genTemp(currType)
+        temp = operandStack[-1]
+        aux = fnTable[programID]["vars"][id]
+        operandStack.append({"id": id, "type": aux.get("type"), "dir": aux.get("dir")})
         assignment()
-        operandStack.append({"id": temp, "type": currType, "dir": None})
+        operandStack.append({"id": temp, "type": currType, "dir": temp.get("dir")})
 
 
 def p_callp(p):
@@ -251,14 +245,22 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
-    if p[3] != "void":
-        aux = operandStack.pop()
+    aux = operandStack.pop()
+    if programID == funcID:
+        print(f"Cannot have return on function main")
+        sys.exit()
+
+    elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
         operandStack.append(
-            {"id": funcID, "type": fnTable[funcID].get("type"), "dir": None}
+            {
+                "id": funcID,
+                "type": fnTable[programID]["vars"][funcID].get("type"),
+                "dir": fnTable[programID]["vars"][funcID].get("dir"),
+            }
         )
         operandStack.append(aux)
         assignment()
-    elif fnTable[funcID].get("type") != "void":
+    else:
         print(f"Type mismatch on return for function {funcID}")
         sys.exit()
 
@@ -289,7 +291,7 @@ def p_write(p):
     global operandStack, paramCounter
     while paramCounter > 0:
         temp = operandStack.pop(-paramCounter)
-        newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("id"))
+        newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("dir"))
         quadList.append(newQuad)
         paramCounter = paramCounter - 1
 
@@ -429,7 +431,10 @@ def p_f3(p):
     var = operandStack.pop()
     print(var)
     aux = jumpStack.pop()
-    newQuad = Quad("+", var, {"id": 1, "type": "int"}, var.get("id"))
+    newQuad = Quad(
+        "+", var, {"dir": checkConstOverlap({"type": int, "id": 1})}, var.get("dir")
+    )
+
     quadList.append(newQuad)
     newQuad = Quad("GOTO", EMPTY, EMPTY, jumpStack.pop())
     quadList.append(newQuad)
@@ -611,18 +616,17 @@ def findIdType(id):
 
 
 def checkFuncOverlap():
-    global fnTable
+    global fnTable, funcID
     if funcID in fnTable:
         print(f"Function name {funcID} has been declared elsewhere")
         sys.exit()
     else:
         fnTable[funcID] = {"type": currType, "dir": len(quadList), "vars": {}}
         if currType != "void":
-            fnTable[programID]["vars"][funcID] = {
-                "type": currType,
-                "arrSize": 0,
-                "dir": None,
-            }
+            id = funcID
+            funcID = programID
+            checkVarOverlap(id, 0)
+            funcID = id
 
 
 def findFunc(func):
@@ -658,16 +662,23 @@ def genQuad(operator):
     tempType = cube[operand1.get("type")][operand2.get("type")][operator]
 
     if tempType != "error":
-        temp = "temp" + str(tempCont)
-        tempCont += 1
-        operandStack.append({"id": temp, "type": tempType, "dir": None})
-        newQuad = Quad(operator, operand1, operand2, temp)
+        genTemp(tempType)
+        newQuad = Quad(operator, operand1, operand2, operandStack[-1].get("dir"))
         quadList.append(newQuad)
     else:
         print(
             f"Type mismatch caused by {operator} on {operand1.get('id')} and {operand2.get('id')}"
         )
         sys.exit()
+
+
+def genTemp(tempType):
+    global tempCont
+    temp = "temp" + str(tempCont)
+    tempCont += 1
+    isLocal = programID != funcID
+    dir = tMemory.malloc(tempType, isLocal)
+    operandStack.append({"id": temp, "type": tempType, "dir": dir})
 
 
 # Build the parser
