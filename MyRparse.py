@@ -149,7 +149,6 @@ def p_mainID(p):
     "mainID :"
     global funcID
     funcID = programID
-    print(funcID)
     quadList[jumpStack.pop()].fill(len(quadList))
 
 
@@ -277,7 +276,7 @@ def p_read(p):
     global operandStack, paramCounter
     while paramCounter > 0:
         temp = operandStack.pop(-paramCounter)
-        newQuad = Quad("READ", EMPTY, EMPTY, temp.get("id"))
+        newQuad = Quad("READ", EMPTY, EMPTY, temp.get("dir"))
         quadList.append(newQuad)
         paramCounter = paramCounter - 1
 
