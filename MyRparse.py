@@ -719,7 +719,10 @@ if __name__ == "__main__":
 
     # mostrar tabla de funciones
     for key in fnTable:
-        print(f"{key}: \n{fnTable[key]}\n")
+        print(f"{key}:")
+        for element in fnTable[key]:
+            print(f"{element}: {fnTable[key][element]}")
+        print()
 
     # mostrar tabla de constantes
     # print(cnTable)
