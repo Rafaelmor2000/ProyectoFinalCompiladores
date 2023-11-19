@@ -149,7 +149,7 @@ class TempMemory:
                     self.gStringList.append(" ")
         return dir
 
-    # Save required memory for local temps, and reset for next function
+    # Return required memory for local temps, and reset for next function
     def clear(self):
         reqMem = {
             "bool": self.lBoolCount,
@@ -191,30 +191,31 @@ class TempMemory:
             print("no local memory for int temps available")
             sys.exit()
         else:
-            for i in range(bools):
+            for i in range(ints):
                 self.lIntList.append(0)
 
         if self.lFloatCount >= LCHAR:
             print("no local memory for float temps available")
             sys.exit()
         else:
-            for i in range(bools):
+            for i in range(floats):
                 self.lFloatList.append(0.0)
 
         if self.lCharCount >= LSTRING:
             print("no local memory for char temps available")
             sys.exit()
         else:
-            for i in range(bools):
+            for i in range(chars):
                 self.lCharList.append(" ")
 
         if self.lStringCount >= LLIM:
             print("no local memory for string temps available")
             sys.exit()
         else:
-            for i in range(bools):
+            for i in range(strings):
                 self.lStringList.append(" ")
 
+    # return value stored in memory direction
     def getValue(self, dir):
         if dir < LLIM:
             if dir < LBOOL:
@@ -256,6 +257,7 @@ class TempMemory:
             elif dir < GLIM:
                 return self.gStringList[dir - GSTRING]
 
+    # Save value to memory direction
     def saveValue(self, dir, value):
         if dir < LLIM:
             if dir < LBOOL:
