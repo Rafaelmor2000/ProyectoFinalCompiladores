@@ -18,7 +18,7 @@ class GlobalMemory:
             arrSize = int(var.get("arrSize"))
             dir += self.intCount + arrSize
             if dir < 10000 or dir >= 11000:
-                print("no memory available")
+                print("no global memory for int variables available")
                 sys.exit()
             else:
                 if arrSize > 1:
@@ -35,7 +35,7 @@ class GlobalMemory:
             arrSize = int(var.get("arrSize"))
             dir += self.floatCount + arrSize
             if dir < 11000 or dir >= 12000:
-                print("no memory available")
+                print("no global memory for float variables available")
                 sys.exit()
 
             else:
@@ -53,7 +53,7 @@ class GlobalMemory:
             arrSize = int(var.get("arrSize"))
             dir += self.charCount + arrSize
             if dir < 12000 or dir >= 13000:
-                print("no memory available")
+                print("no global memory for char variables available")
                 sys.exit()
 
             else:

@@ -34,7 +34,7 @@ class TempMemory:
                 dir = 40000
                 dir += self.lBoolCount
                 if dir < 40000 or dir >= 40500:
-                    print("no memory available")
+                    print("no local memory for bool temps available")
                     sys.exit()
                 else:
                     self.lBoolCount += 1
@@ -43,7 +43,7 @@ class TempMemory:
                 dir = 40500
                 dir += self.lIntCount
                 if dir < 40500 or dir >= 41000:
-                    print("no memory available")
+                    print("no local memory for int temps available")
                     sys.exit()
                 else:
                     self.lIntCount += 1
@@ -52,7 +52,7 @@ class TempMemory:
                 dir = 41000
                 dir += self.lFloatCount
                 if dir < 41000 or dir >= 41500:
-                    print("no memory available")
+                    print("no local memory for float temps available")
                     sys.exit()
 
                 else:
@@ -62,7 +62,7 @@ class TempMemory:
                 dir = 41500
                 dir += self.lCharCount
                 if dir < 41500 or dir >= 42000:
-                    print("no memory available")
+                    print("no local memory for char temps available")
                     sys.exit()
 
                 else:
@@ -72,7 +72,7 @@ class TempMemory:
                 dir = 42000
                 dir += self.lStringCount
                 if dir < 42500 or dir >= 42500:
-                    print("no memory available")
+                    print("no local memory for string temps available")
                     sys.exit()
 
                 else:
@@ -84,7 +84,7 @@ class TempMemory:
                 dir = 50000
                 dir += self.gBoolCount
                 if dir < 50000 or dir >= 50500:
-                    print("no memory available")
+                    print("no global memory for bool temps available")
                     sys.exit()
                 else:
                     self.gBoolCount += 1
@@ -94,7 +94,7 @@ class TempMemory:
                 dir = 50500
                 dir += self.gIntCount
                 if dir < 50500 or dir >= 51000:
-                    print("no memory available")
+                    print("no global memory for int temps available")
                     sys.exit()
                 else:
                     self.gIntCount += 1
@@ -104,7 +104,7 @@ class TempMemory:
                 dir = 51000
                 dir += self.gFloatCount
                 if dir < 51000 or dir >= 51500:
-                    print("no memory available")
+                    print("no global memory for float temps available")
                     sys.exit()
 
                 else:
@@ -115,7 +115,7 @@ class TempMemory:
                 dir = 51500
                 dir += self.gCharCount
                 if dir < 51500 or dir >= 52000:
-                    print("no memory available")
+                    print("no global memory for char temps available")
                     sys.exit()
 
                 else:
@@ -126,7 +126,7 @@ class TempMemory:
                 dir = 52000
                 dir += self.gStringCount
                 if dir < 52500 or dir >= 52500:
-                    print("no memory available")
+                    print("no global memory for string temps available")
                     sys.exit()
 
                 else:
@@ -135,8 +135,17 @@ class TempMemory:
         return dir
 
     def clear(self):
+        reqMem = {
+            "bool": self.lBoolCount,
+            "int": self.lIntCount,
+            "float": self.lFloatCount,
+            "char": self.lCharCount,
+            "string": self.lStringCount,
+        }
+
         self.lBoolCount = 0
         self.lIntCount = 0
         self.lFloatCount = 0
         self.lCharCount = 0
         self.lStringCount = 0
+        return reqMem

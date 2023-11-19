@@ -6,8 +6,12 @@ float largo, area;
 function void cuadrado(int cant){
     write(cant * cant);
 }
-function float rectangulo(int grosor, float alto){
-    return(alto);
+function float rectangulo(int grosor, float alto)
+vars
+float hola[5];
+{
+    hola[1] = 5.8;
+    return(5.8);
 }
 main()
 {

@@ -18,7 +18,7 @@ class LocalMemory:
             arrSize = int(var.get("arrSize"))
             dir += self.intCount + arrSize
             if dir < 20000 or dir >= 21000:
-                print("no memory available")
+                print("no local memory for int variables available")
                 sys.exit()
             else:
                 if arrSize > 1:
@@ -33,7 +33,7 @@ class LocalMemory:
             dir += self.floatCount + arrSize
 
             if dir < 21000 or dir >= 22000:
-                print("no memory available")
+                print("no local memory for float variables available")
                 sys.exit()
 
             else:
@@ -48,7 +48,7 @@ class LocalMemory:
             arrSize = int(var.get("arrSize"))
             dir += self.charCount + arrSize
             if dir < 22000 or dir >= 23000:
-                print("no memory available")
+                print("no local memory for char variables available")
                 sys.exit()
 
             else:
@@ -61,6 +61,14 @@ class LocalMemory:
         return dir
 
     def clear(self):
+        reqMem = {
+            "int": self.intCount,
+            "float": self.floatCount,
+            "char": self.charCount,
+        }
+
         self.intCount = 0
         self.floatCount = 0
         self.charCount = 0
+
+        return reqMem
