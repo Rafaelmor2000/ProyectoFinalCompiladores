@@ -402,7 +402,6 @@ def p_w3(p):
 def p_for(p):
     "for : FOR ID EQUAL expression f1 expression f2 statements"
     var = operandStack.pop()
-    print(var)
     aux = jumpStack.pop()
     checkConstOverlap({"type": "int", "id": 1})
     newQuad = Quad("+", var, operandStack.pop(), var.get("dir"))
@@ -501,7 +500,6 @@ def p_variablep(p):
 
         var = operandStack.pop()
         exp = operandStack.pop()
-        print(var, exp)
         if exp.get("type") != "int":
             print(
                 f"Expression for array in line {p.lineno(1)!r} needs to result in integer type"
