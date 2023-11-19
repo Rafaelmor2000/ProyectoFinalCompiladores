@@ -96,8 +96,8 @@ def p_function(p):
     global paramCounter
     newQuad = Quad("ENDFUNC", EMPTY, EMPTY, " ")
     quadList.append(newQuad)
-    lMemory.clear()
-    tMemory.clear()
+    fnTable[funcID]["reqTemps"] = tMemory.clear()
+    fnTable[funcID]["reqVars"] = lMemory.clear()
 
 
 def p_functionp(p):
@@ -207,13 +207,15 @@ def p_call(p):
         print(f"Missing parameters in call to {id}")
         sys.exit()
 
+    newQuad = Quad("ERA", EMPTY, EMPTY, id)
+    quadList.append(newQuad)
+
     keys = list(fnTable[id]["vars"])
     while paramCounter > 0:
         parameter = operandStack.pop(-paramCounter)
         key = keys[params - paramCounter]
 
         if parameter.get("type") == fnTable[id]["vars"][key].get("type"):
-            # newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter + 1)
             newQuad = Quad(
                 "PARAM", parameter, EMPTY, fnTable[id]["vars"][key].get("dir")
             )
@@ -253,25 +255,25 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
-    # print(funcID)
-    # aux = operandStack.pop()
-    # if programID == funcID:
-    #     print(f"Cannot have return on function main")
-    #     sys.exit()
+    print(funcID)
+    aux = operandStack.pop()
+    if programID == funcID:
+        print(f"Cannot have return on function main")
+        sys.exit()
 
-    # elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
-    #     operandStack.append(
-    #         {
-    #             "id": funcID,
-    #             "type": fnTable[programID]["vars"][funcID].get("type"),
-    #             "dir": fnTable[programID]["vars"][funcID].get("dir"),
-    #         }
-    #     )
-    #     operandStack.append(aux)
-    #     assignment()
-    # else:
-    #     print(f"Type mismatch on return for function {funcID}")
-    #     sys.exit()
+    elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
+        operandStack.append(
+            {
+                "id": funcID,
+                "type": fnTable[programID]["vars"][funcID].get("type"),
+                "dir": fnTable[programID]["vars"][funcID].get("dir"),
+            }
+        )
+        operandStack.append(aux)
+        assignment()
+    else:
+        print(f"Type mismatch on return for function {funcID}")
+        sys.exit()
 
 
 def p_read(p):
