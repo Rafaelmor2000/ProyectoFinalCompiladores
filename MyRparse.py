@@ -228,9 +228,7 @@ def p_call(p):
         if parameter.get("type") == fnTable[id]["vars"][key].get(
             "type"
         ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
-            newQuad = Quad(
-                "PARAM", parameter, EMPTY, fnTable[id]["vars"][key].get("dir")
-            )
+            newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter)
 
             quadList.append(newQuad)
             paramCounter -= 1
@@ -275,9 +273,7 @@ def p_return(p):
 
     # elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
     elif aux.get("type") == fnTable[funcID].get("type"):
-        newQuad = Quad(
-            "RETURN", aux, EMPTY, fnTable[programID]["vars"][funcID].get("dir")
-        )
+        newQuad = Quad("RETURN", EMPTY, EMPTY, aux.get("dir"))
         quadList.append(newQuad)
 
     else:
@@ -536,8 +532,6 @@ def p_bool(p):
     global operandStack
     cn = {"id": p[-1], "type": "bool"}
     dir = checkConstOverlap(cn)
-    # cn["dir"] = dir
-    # operandStack.append(cn)
 
 
 def p_char(p):
@@ -545,8 +539,6 @@ def p_char(p):
     global operandStack
     cn = {"id": p[-1], "type": "char"}
     dir = checkConstOverlap(cn)
-    # cn["dir"] = dir
-    # operandStack.append(cn)
 
 
 def p_string(p):
@@ -554,8 +546,6 @@ def p_string(p):
     global operandStack
     cn = {"id": p[-1], "type": "string"}
     dir = checkConstOverlap(cn)
-    # cn["dir"] = dir
-    # operandStack.append(cn)
 
 
 def p_int(p):
@@ -563,8 +553,6 @@ def p_int(p):
     global operandStack
     cn = {"id": p[-1], "type": "int"}
     dir = checkConstOverlap(cn)
-    # cn["dir"] = dir
-    # operandStack.append(cn)
 
 
 def p_float(p):
@@ -572,8 +560,6 @@ def p_float(p):
     global operandStack
     cn = {"id": p[-1], "type": "float"}
     dir = checkConstOverlap(cn)
-    # cn["dir"] = dir
-    # operandStack.append(cn)
 
 
 def p_type(p):

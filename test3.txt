@@ -12,7 +12,7 @@ float otro, area;
 {
     cuadrado();
     area = grosor * altura / 2;
-    return(grosor * altura / 2);
+    return(area);
 }
 
 function void trapecio(float anchoArriba, float anchoAbajo, float altura){
