@@ -123,17 +123,29 @@ def p_parameters(p):
     while paramCounter > 0:
         temp = operandStack.pop()
         currType = temp[1]
-        checkVarOverlap(temp[0], 0)
+        checkVarOverlap(temp[0], temp[2])
         paramCounter = paramCounter - 1
 
 
 def p_parametersp(p):
-    """parametersp : type ID parameterspp
+    """parametersp : type ID parameterArray parameterspp
     | empty"""
     if len(p) == 4:
         global paramCounter
         operandStack.append([p[2], p[1]])
         paramCounter += 1
+
+
+def p_parameterArray(p):
+    """parameterArray : LBRACKET CTE_I RBRACKET
+    | empty"""
+    global paramCounter
+    if len(p) == 4:
+        var = [p[-1], p[-2], p[2]]
+    else:
+        var = [p[-1], p[-2], 0]
+    operandStack.append(var)
+    paramCounter += 1
 
 
 def p_parameterspp(p):
