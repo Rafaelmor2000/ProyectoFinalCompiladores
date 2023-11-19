@@ -201,8 +201,6 @@ def p_call(p):
     global paramCounter, tempCont
     id = p[1]
     currType, dir, params = findFunc(id)
-
-    print(params, paramCounter)
     if params != paramCounter:
         print(f"Wrong number of parameters in call to {id}")
         sys.exit()
