@@ -1,6 +1,6 @@
 program area;
 vars
-float ancho, largo;
+float ancho[5], largo;
 
 function void cuadrado(){
     write(ancho * ancho);
@@ -16,7 +16,7 @@ float otro, area;
 }
 
 function void trapecio(float anchoArriba, float anchoAbajo, float altura){
-    anchoArriba = triangulo(anchoArriba, altura);
+    anchoArriba = triangulo(ancho, altura);
     write((anchoArriba+anchoAbajo)*altura/2);
 }
 

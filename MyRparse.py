@@ -222,10 +222,12 @@ def p_call(p):
 
     keys = list(fnTable[id]["vars"])
     while paramCounter > 0:
-        parameter = operandStack.pop(-paramCounter)
+        parameter = operandStack.pop()
         key = keys[params - paramCounter]
 
-        if parameter.get("type") == fnTable[id]["vars"][key].get("type"):
+        if parameter.get("type") == fnTable[id]["vars"][key].get(
+            "type"
+        ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
             newQuad = Quad(
                 "PARAM", parameter, EMPTY, fnTable[id]["vars"][key].get("dir")
             )
@@ -233,7 +235,7 @@ def p_call(p):
             quadList.append(newQuad)
             paramCounter -= 1
         else:
-            print(f"Parameter types do not match call to {id}")
+            print(f"Parameter types or arrSize do not match call to {id}")
             sys.exit()
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
