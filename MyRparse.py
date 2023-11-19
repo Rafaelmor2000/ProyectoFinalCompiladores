@@ -228,12 +228,15 @@ def p_call(p):
     quadList.append(newQuad)
 
     if currType != "void":
+        print(currType)
         genTemp(currType)
         temp = operandStack[-1]
         aux = fnTable[programID]["vars"][id]
         operandStack.append({"id": id, "type": aux.get("type"), "dir": aux.get("dir")})
         assignment()
-        operandStack.append({"id": temp, "type": currType, "dir": temp.get("dir")})
+        operandStack.append(
+            {"id": temp, "type": temp.get("type"), "dir": temp.get("dir")}
+        )
 
 
 def p_callp(p):
@@ -250,25 +253,25 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
-    print(funcID)
-    aux = operandStack.pop()
-    if programID == funcID:
-        print(f"Cannot have return on function main")
-        sys.exit()
+    # print(funcID)
+    # aux = operandStack.pop()
+    # if programID == funcID:
+    #     print(f"Cannot have return on function main")
+    #     sys.exit()
 
-    elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
-        operandStack.append(
-            {
-                "id": funcID,
-                "type": fnTable[programID]["vars"][funcID].get("type"),
-                "dir": fnTable[programID]["vars"][funcID].get("dir"),
-            }
-        )
-        operandStack.append(aux)
-        assignment()
-    else:
-        print(f"Type mismatch on return for function {funcID}")
-        sys.exit()
+    # elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
+    #     operandStack.append(
+    #         {
+    #             "id": funcID,
+    #             "type": fnTable[programID]["vars"][funcID].get("type"),
+    #             "dir": fnTable[programID]["vars"][funcID].get("dir"),
+    #         }
+    #     )
+    #     operandStack.append(aux)
+    #     assignment()
+    # else:
+    #     print(f"Type mismatch on return for function {funcID}")
+    #     sys.exit()
 
 
 def p_read(p):
@@ -500,7 +503,7 @@ def p_variablep(p):
         else:
             newQuad = Quad("VER", exp, EMPTY, f"0-{var.get('arrSize')-1}")
             quadList.append(newQuad)
-            checkConstOverlap({"type": "int", "id": var.get("dir")})
+            checkConstOverlap({"type": var.get("type"), "id": var.get("dir")})
             operandStack.append(exp)
             genQuad("+")
             temp = operandStack.pop()
