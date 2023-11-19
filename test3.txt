@@ -10,11 +10,13 @@ function float triangulo(float grosor, float altura)
 vars
 float otro, area;
 {
+    cuadrado();
     area = grosor * altura / 2;
     return(grosor * altura / 2);
 }
 
 function void trapecio(float anchoArriba, float anchoAbajo, float altura){
+    anchoArriba = triangulo(ancho, largo);
     write((anchoArriba+anchoAbajo)*altura/2);
 }
 

@@ -198,13 +198,13 @@ def p_assignmentp(p):
 
 def p_call(p):
     "call : ID initParams LPAREN callp RPAREN"
-    print(funcID)
     global paramCounter, tempCont
     id = p[1]
     currType, dir, params = findFunc(id)
 
+    print(params, paramCounter)
     if params != paramCounter:
-        print(f"Missing parameters in call to {id}")
+        print(f"Wrong number of parameters in call to {id}")
         sys.exit()
 
     newQuad = Quad("ERA", EMPTY, EMPTY, id)
@@ -230,7 +230,6 @@ def p_call(p):
     quadList.append(newQuad)
 
     if currType != "void":
-        print(currType)
         genTemp(currType)
         temp = operandStack[-1]
         aux = fnTable[programID]["vars"][id]
@@ -245,7 +244,8 @@ def p_callp(p):
     """callp : expression callpp
     | empty"""
     global paramCounter
-    paramCounter += 1
+    if len(p) == 3:
+        paramCounter += 1
 
 
 def p_callpp(p):
@@ -255,22 +255,19 @@ def p_callpp(p):
 
 def p_return(p):
     "return : RETURN LPAREN expression RPAREN"
-    print(funcID)
     aux = operandStack.pop()
+
     if programID == funcID:
         print(f"Cannot have return on function main")
         sys.exit()
 
-    elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
-        operandStack.append(
-            {
-                "id": funcID,
-                "type": fnTable[programID]["vars"][funcID].get("type"),
-                "dir": fnTable[programID]["vars"][funcID].get("dir"),
-            }
+    # elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
+    elif aux.get("type") == fnTable[funcID].get("type"):
+        newQuad = Quad(
+            "RETURN", aux, EMPTY, fnTable[programID]["vars"][funcID].get("dir")
         )
-        operandStack.append(aux)
-        assignment()
+        quadList.append(newQuad)
+
     else:
         print(f"Type mismatch on return for function {funcID}")
         sys.exit()
@@ -724,10 +721,10 @@ if __name__ == "__main__":
 
     # mostrar tabla de funciones
     for key in fnTable:
-        print(f"{key} : {fnTable[key]}")
+        print(f"{key}: \n{fnTable[key]}\n")
 
     # mostrar tabla de constantes
-    print(cnTable)
+    # print(cnTable)
 
     # mostrar quads en lista
     cont = 0
@@ -735,8 +732,8 @@ if __name__ == "__main__":
         print(cont, str(quad))
         cont = cont + 1
 
-    for operand in operandStack:
-        print(str(operand))
+    # for operand in operandStack:
+    #     print(str(operand))
 
-    for jump in jumpStack:
-        print(str(jump))
+    # for jump in jumpStack:
+    #     print(str(jump))
