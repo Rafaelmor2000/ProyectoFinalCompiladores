@@ -486,21 +486,26 @@ def p_variablep(p):
     """variablep : LBRACKET expression RBRACKET
     | empty"""
     findIdType(p[-1])
-    # if len(p) == 4:
-    #     global quadList
+    if len(p) == 4:
+        global quadList
 
-    #     var = operandStack.pop()
-    #     exp = operandStack.pop()
-    #     print(var, exp)
-    #     if exp.get("type") != "int":
-    #         print(
-    #             f"Expression for array in line {p.lineno(1)!r} needs to result in integer type"
-    #         )
-    #         sys.exit()
-    #     else:
-    #         newQuad = Quad("VER", exp, EMPTY, f"0-{var.get('arrSize')-1}")
-    #         quadList.append(newQuad)
-    #         operandStack.append(checkConstOverlap({"type": "int", "id": var.get("dir")})
+        var = operandStack.pop()
+        exp = operandStack.pop()
+        print(var, exp)
+        if exp.get("type") != "int":
+            print(
+                f"Expression for array in line {p.lineno(1)!r} needs to result in integer type"
+            )
+            sys.exit()
+        else:
+            newQuad = Quad("VER", exp, EMPTY, f"0-{var.get('arrSize')-1}")
+            quadList.append(newQuad)
+            checkConstOverlap({"type": "int", "id": var.get("dir")})
+            operandStack.append(exp)
+            genQuad("+")
+            temp = operandStack.pop()
+            temp["dir"] = f"*{temp.get('dir')}"
+            operandStack.append(temp)
 
 
 def p_var_cte(p):
