@@ -55,8 +55,10 @@ class VirtualMachine:
                     reqVars = self.fnTable[quad.temp]["reqVars"]
                     self.lMemory.pop(reqVars)
                     self.tMemory.pop(reqTemps)
+                    curr = self.jumpStack.pop()
 
                 elif quad.operator == "GOSUB":
+                    self.jumpStack.append(curr)
                     curr = quad.temp - 1
 
             else:

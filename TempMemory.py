@@ -177,7 +177,6 @@ class TempMemory:
             "char": self.lCharCount,
             "string": self.lStringCount,
         }
-
         bools = reqMem.get("bool")
         self.lBoolCount += bools
         ints = reqMem.get("int")
@@ -238,7 +237,7 @@ class TempMemory:
         strings = reqMem.get("string")
         self.lStringCount -= strings
 
-        self.lBoolCount = self.lBoolList[:-bools]
+        self.lBoolList = self.lBoolList[:-bools]
         self.lIntList = self.lIntList[:-ints]
         self.lFloatList = self.lFloatList[:-floats]
         self.lCharList = self.lCharList[:-chars]
