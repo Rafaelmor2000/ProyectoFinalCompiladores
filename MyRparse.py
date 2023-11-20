@@ -8,6 +8,7 @@ from GlobalMemory import *
 from LocalMemory import *
 from Quad import Quad
 from TempMemory import *
+from VirtualMachine import *
 
 tokens = MyRlex.tokens
 
@@ -506,7 +507,7 @@ def p_variablep(p):
             )
             sys.exit()
         else:
-            newQuad = Quad("VER", exp, EMPTY, f"0-{var.get('arrSize')-1}")
+            newQuad = Quad("VER", exp, EMPTY, var.get("arrSize"))
             quadList.append(newQuad)
             checkConstOverlap({"type": var.get("type"), "id": var.get("dir")})
             operandStack.append(exp)
@@ -736,3 +737,6 @@ if __name__ == "__main__":
 
     # for jump in jumpStack:
     #     print(str(jump))
+
+    vm = VirtualMachine(fnTable, gMemory, lMemory, cMemory, tMemory)
+    vm.run(quadList)

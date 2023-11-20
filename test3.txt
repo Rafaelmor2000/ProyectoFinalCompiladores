@@ -22,7 +22,7 @@ function void trapecio(float anchoArriba, float anchoAbajo, float altura){
 
 main()
 {
-    ancho = 5.0;
+    read(ancho);
     largo = -2.0;
     triangulo(ancho, largo);
     while(largo > -2) do {

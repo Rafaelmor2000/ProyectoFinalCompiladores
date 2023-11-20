@@ -86,7 +86,7 @@ class ConstantMemory:
             sys.exit()
 
         elif dir < INT:
-            return self.boolListoolList[dir - BOOL]
+            return self.boolList[dir - BOOL]
 
         elif dir < FLOAT:
             return self.intList[dir - INT]

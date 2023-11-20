@@ -103,7 +103,7 @@ class TempMemory:
                     sys.exit()
                 else:
                     self.gBoolCount += 1
-                    self.gBoolList.append(True)
+                    self.gBoolList.append("true")
 
             elif tempType == "int":
                 dir = GINT
@@ -185,7 +185,7 @@ class TempMemory:
             sys.exit()
         else:
             for i in range(bools):
-                self.lBoolList.append(True)
+                self.lBoolList.append("true")
 
         if self.lIntCount >= LFLOAT:
             print("no local memory for int temps available")
