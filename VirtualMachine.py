@@ -1,15 +1,10 @@
 import sys
 
-GLIM = 13000
-LLIM = 23000
-CLIM = 32500
-TLIM = 52500
+from MemoryMap import CLIM, GLIM, GLOBALLIM, LOCALLIM
 
 
 class VirtualMachine:
     def __init__(self, fnTable, gMemory, lMemory, cMemory, tMemory) -> None:
-        # self.varOffsetMap = {"int": 0, "float": 0, "char": 0}
-        # self.tempOffsetMap = {"bool": 0, "int": 0, "float": 0, "char": 0, "string": 0}
         self.jumpStack = []
 
         self.fnTable = fnTable
@@ -23,6 +18,7 @@ class VirtualMachine:
         curr = 0
         while quadList[curr].operator != "DONE":
             quad = quadList[curr]
+            print(quad)
             if quad.operand2 == None:
                 # execute more complex operations
                 if quad.operator == "=":
@@ -45,7 +41,23 @@ class VirtualMachine:
                     max = quad.temp
                     op1 = self.getValue(quad.operand1)
                     if op1 < min or op1 >= max:
-                        print(f"Error: Array index out of range")
+                        print(f"Error: Array index {op1} out of range")
+                        sys.exit()
+
+                elif quad.operator == "ERA":
+                    reqTemps = self.fnTable[quad.temp]["reqTemps"]
+                    reqVars = self.fnTable[quad.temp]["reqVars"]
+                    self.lMemory.era(reqVars)
+                    self.tMemory.era(reqTemps)
+
+                elif quad.operator == "ENDFUNC":
+                    reqTemps = self.fnTable[quad.temp]["reqTemps"]
+                    reqVars = self.fnTable[quad.temp]["reqVars"]
+                    self.lMemory.pop(reqVars)
+                    self.tMemory.pop(reqTemps)
+
+                elif quad.operator == "GOSUB":
+                    curr = quad.temp - 1
 
             else:
                 op1 = self.getValue(quad.operand1)
@@ -53,7 +65,6 @@ class VirtualMachine:
                 res = self.do(quad.operator, op1, op2)
                 self.saveValue(quad.temp, res)
 
-            print(quad)
             curr += 1
 
     # return value from appropriate memory direction
@@ -62,9 +73,9 @@ class VirtualMachine:
             dir = int(dir[1:])
             dir = self.getValue(dir)
 
-        if dir < GLIM:
+        if dir < GLOBALLIM:
             value = self.gMemory.getValue(dir)
-        elif dir < LLIM:
+        elif dir < LOCALLIM:
             value = self.lMemory.getValue(dir)
         elif dir < CLIM:
             value = self.cMemory.getValue(dir)
@@ -72,14 +83,15 @@ class VirtualMachine:
                 value = True
             elif value == "false":
                 value = False
-        elif dir < TLIM:
+        elif dir < GLIM:
             value = self.tMemory.getValue(dir)
             if value == "true":
                 value = True
             elif value == "false":
                 value = False
         else:
-            print("Invalid memory direction")
+            print(f"{dir} is an invalid memory direction")
+            sys.exit()
         return value
 
     # save value to appropriate direction
@@ -88,16 +100,17 @@ class VirtualMachine:
             dir = int(dir[1:])
             dir = self.getValue(dir)
 
-        if dir < GLIM:
+        if dir < GLOBALLIM:
             self.gMemory.saveValue(dir, value)
-        elif dir < LLIM:
+        elif dir < LOCALLIM:
             self.lMemory.saveValue(dir, value)
         elif dir < CLIM:
             self.cMemory.saveValue(dir, value)
-        elif dir < TLIM:
+        elif dir < GLIM:
             self.tMemory.saveValue(dir, value)
         else:
-            print("Invalid memory direction")
+            print(f"{dir} is an invalid memory direction")
+            sys.exit()
 
     # execute simple expressions
     def do(self, operator, op1, op2):

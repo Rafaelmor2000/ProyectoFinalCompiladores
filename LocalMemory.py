@@ -1,9 +1,11 @@
 import sys
 
-INT = 20000
-FLOAT = 21000
-CHAR = 22000
-LIM = 23000
+from MemoryMap import LOCALCHAR, LOCALFLOAT, LOCALINT, LOCALLIM
+
+INT = LOCALINT
+FLOAT = LOCALFLOAT
+CHAR = LOCALCHAR
+LIM = LOCALLIM
 
 
 class LocalMemory:
@@ -14,6 +16,7 @@ class LocalMemory:
         self.floatList = []
         self.charCount = 0
         self.charList = []
+        self.varOffsetMap = {"int": 0, "float": 0, "char": 0}
 
     def malloc(self, var):
         varType = var.get("type")
@@ -78,8 +81,14 @@ class LocalMemory:
 
         return reqMem
 
-    # Assign space and initialize local variables
+    # Assign space and initialize local variables, save offset
     def era(self, reqMem):
+        self.varOffsetMap = {
+            "int": self.intCount,
+            "float": self.floatCount,
+            "char": self.charCount,
+        }
+
         ints = reqMem.get("int")
         self.intCount += ints
         floats = reqMem.get("float")
@@ -109,19 +118,32 @@ class LocalMemory:
             for i in range(chars):
                 self.lCharList.append(" ")
 
+    # release unrequired memory and revert offset to previous state
+    def pop(self, reqMem):
+        ints = reqMem.get("int")
+        self.intCount -= ints
+        floats = reqMem.get("float")
+        self.floatCount -= floats
+        chars = reqMem.get("char")
+        self.charCount -= chars
+
+        self.intList = self.intList[:-ints]
+        self.floatList = self.floatList[:-floats]
+        self.charListharList = self.charList[:-chars]
+
     def getValue(self, dir):
         if dir < INT or dir >= LIM:
             print("Invalid direction for variable")
             sys.exit()
 
         elif dir < FLOAT:
-            return self.intList[dir - INT]
+            return self.intList[dir - INT + self.varOffsetMap["int"]]
 
         elif dir < CHAR:
-            return self.floatList[dir - FLOAT]
+            return self.floatList[dir - FLOAT + self.varOffsetMap["float"]]
 
         elif dir < LIM:
-            return self.charList[dir - CHAR]
+            return self.charList[dir - CHAR + self.varOffsetMap["char"]]
 
     def saveValue(self, dir, value):
         if dir < INT or dir >= LIM:
@@ -129,10 +151,10 @@ class LocalMemory:
             sys.exit()
 
         elif dir < FLOAT:
-            self.intList[dir - INT] = value
+            self.intList[dir - INT + self.varOffsetMap["int"]] = value
 
         elif dir < CHAR:
-            self.floatList[dir - FLOAT] = value
+            self.floatList[dir - +self.varOffsetMap["float"]] = value
 
         elif dir < LIM:
-            self.charList[dir - CHAR] = value
+            self.charList[dir - CHAR + self.varOffsetMap["char"]] = value

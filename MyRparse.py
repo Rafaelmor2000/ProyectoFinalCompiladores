@@ -95,7 +95,7 @@ def p_function(p):
     """function : FUNCTION functionp ID funcID parameters vars statements
     | empty"""
     global paramCounter
-    newQuad = Quad("ENDFUNC", EMPTY, EMPTY, " ")
+    newQuad = Quad("ENDFUNC", EMPTY, EMPTY, p[3])
     quadList.append(newQuad)
     fnTable[funcID]["reqTemps"] = tMemory.clear()
     fnTable[funcID]["reqVars"] = lMemory.clear()
@@ -439,7 +439,7 @@ def p_f2(p):
     if exp2.get("type") == "int":
         operandStack.append(var)
         operandStack.append(exp2)
-        genQuad("<")
+        genQuad("<=")
         jumpStack.append(len(quadList))
         newQuad = Quad("GOTOF", operandStack.pop(), EMPTY, " ")
         quadList.append(newQuad)

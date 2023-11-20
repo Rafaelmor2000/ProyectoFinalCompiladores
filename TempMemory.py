@@ -1,18 +1,19 @@
 import sys
 
-LBOOL = 40000
-LINT = 40500
-LFLOAT = 41000
-LCHAR = 41500
-LSTRING = 42000
-LLIM = 42500
-
-GBOOL = 50000
-GINT = 50500
-GFLOAT = 51000
-GCHAR = 51500
-GSTRING = 52000
-GLIM = 52500
+from MemoryMap import (
+    GBOOL,
+    GCHAR,
+    GFLOAT,
+    GINT,
+    GLIM,
+    GSTRING,
+    LBOOL,
+    LCHAR,
+    LFLOAT,
+    LINT,
+    LLIM,
+    LSTRING,
+)
 
 
 # Temp Memory Manager
@@ -41,6 +42,7 @@ class TempMemory:
         self.lCharList = []
         self.lStringCount = 0
         self.lStringList = []
+        self.tempOffsetMap = {"bool": 0, "int": 0, "float": 0, "char": 0, "string": 0}
 
     def malloc(self, tempType, isLocal):
         # local temps
@@ -166,8 +168,16 @@ class TempMemory:
         self.lStringCount = 0
         return reqMem
 
-    # Assign space and initialize local temps
+    # Assign space and initialize local temps, save offset
     def era(self, reqMem):
+        self.tempOffsetMap = {
+            "bool": self.lBoolCount,
+            "int": self.lIntCount,
+            "float": self.lFloatCount,
+            "char": self.lCharCount,
+            "string": self.lStringCount,
+        }
+
         bools = reqMem.get("bool")
         self.lBoolCount += bools
         ints = reqMem.get("int")
@@ -215,6 +225,25 @@ class TempMemory:
             for i in range(strings):
                 self.lStringList.append(" ")
 
+    # release unrequired memory and revert offset to previous state
+    def pop(self, reqMem):
+        bools = reqMem.get("bool")
+        self.lBoolCount -= bools
+        ints = reqMem.get("int")
+        self.lIntCount -= ints
+        floats = reqMem.get("float")
+        self.lFloatCount -= floats
+        chars = reqMem.get("char")
+        self.lCharCount -= chars
+        strings = reqMem.get("string")
+        self.lStringCount -= strings
+
+        self.lBoolCount = self.lBoolList[:-bools]
+        self.lIntList = self.lIntList[:-ints]
+        self.lFloatList = self.lFloatList[:-floats]
+        self.lCharList = self.lCharList[:-chars]
+        self.lStringList = self.lStringList[:-strings]
+
     # return value stored in memory direction
     def getValue(self, dir):
         if dir < LLIM:
@@ -223,19 +252,19 @@ class TempMemory:
                 sys.exit()
 
             elif dir < LINT:
-                return self.lBoolList[dir - LBOOL]
+                return self.lBoolList[dir - LBOOL + self.tempOffsetMap["bool"]]
 
             elif dir < LFLOAT:
-                return self.lIntList[dir - LINT]
+                return self.lIntList[dir - LINT + self.tempOffsetMap["int"]]
 
             elif dir < LCHAR:
-                return self.lFloatList[dir - LFLOAT]
+                return self.lFloatList[dir - LFLOAT + self.tempOffsetMap["float"]]
 
             elif dir < LSTRING:
-                return self.lCharList[dir - LCHAR]
+                return self.lCharList[dir - LCHAR + +self.tempOffsetMap["char"]]
 
             elif dir < LLIM:
-                return self.lStringList[dir - LSTRING]
+                return self.lStringList[dir - LSTRING + self.tempOffsetMap["string"]]
 
         else:
             if dir < GBOOL or dir >= GLIM:
@@ -265,19 +294,19 @@ class TempMemory:
                 sys.exit()
 
             elif dir < LINT:
-                self.lBoolList[dir - LBOOL] = value
+                self.lBoolList[dir - LBOOL + self.tempOffsetMap["bool"]] = value
 
             elif dir < LFLOAT:
-                self.lIntList[dir - LINT] = value
+                self.lIntList[dir - LINT + self.tempOffsetMap["int"]] = value
 
             elif dir < LCHAR:
-                self.lFloatList[dir - LFLOAT] = value
+                self.lFloatList[dir - LFLOAT + self.tempOffsetMap["float"]] = value
 
             elif dir < LSTRING:
-                self.lCharList[dir - LCHAR] = value
+                self.lCharList[dir - LCHAR + self.tempOffsetMap["char"]] = value
 
             elif dir < LLIM:
-                self.lStringList[dir - LSTRING] = value
+                self.lStringList[dir - LSTRING + self.tempOffsetMap["string"]] = value
 
         else:
             if dir < GBOOL or dir >= GLIM:
