@@ -285,6 +285,37 @@ class TempMemory:
             elif dir < GLIM:
                 return self.gStringList[dir - GSTRING]
 
+    def getParam(self, dir, reqMem):
+        if dir < LLIM:
+            if dir < LBOOL:
+                print("Invalid direction for temp")
+                sys.exit()
+
+            elif dir < LINT:
+                return self.lBoolList[
+                    dir - LBOOL + self.tempOffsetMap["bool"] - reqMem["bool"]
+                ]
+
+            elif dir < LFLOAT:
+                return self.lIntList[
+                    dir - LINT + self.tempOffsetMap["int"] - reqMem["int"]
+                ]
+
+            elif dir < LCHAR:
+                return self.lFloatList[
+                    dir - LFLOAT + self.tempOffsetMap["float"] - reqMem["float"]
+                ]
+
+            elif dir < LSTRING:
+                return self.lCharList[
+                    dir - LCHAR + +self.tempOffsetMap["char"] - reqMem["char"]
+                ]
+
+            elif dir < LLIM:
+                return self.lStringList[
+                    dir - LSTRING + self.tempOffsetMap["string"] - reqMem["string"]
+                ]
+
     # Save value to memory direction
     def saveValue(self, dir, value):
         if dir < LLIM:

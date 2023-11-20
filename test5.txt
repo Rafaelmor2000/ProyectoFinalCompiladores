@@ -1,0 +1,21 @@
+program test;
+vars
+int array[5];
+
+function void a(int arr[5], int j)
+vars
+int i;
+{
+    j = j+1;
+    for i = 0 to 4 do{
+        arr[i] = i+j;
+        write(arr[i], j);
+    }
+    if (j <= 5) then {
+        a(arr, j);
+    }
+}
+
+main(){
+    a(array, 2);
+}

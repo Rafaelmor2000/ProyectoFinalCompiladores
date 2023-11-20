@@ -225,7 +225,7 @@ def p_call(p):
     while paramCounter > 0:
         parameter = operandStack.pop()
         key = keys[params - paramCounter]
-
+        print(parameter, fnTable[id]["vars"][key])
         if parameter.get("type") == fnTable[id]["vars"][key].get(
             "type"
         ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
@@ -234,7 +234,9 @@ def p_call(p):
             quadList.append(newQuad)
             paramCounter -= 1
         else:
-            print(f"Parameter types or arrSize do not match call to {id}")
+            print(
+                f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+            )
             sys.exit()
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
@@ -529,35 +531,35 @@ def p_var_cte(p):
 def p_bool(p):
     "bool :"
     global operandStack
-    cn = {"id": p[-1], "type": "bool"}
+    cn = {"id": p[-1], "arrSize": 0, "type": "bool"}
     dir = checkConstOverlap(cn)
 
 
 def p_char(p):
     "char :"
     global operandStack
-    cn = {"id": p[-1], "type": "char"}
+    cn = {"id": p[-1], "arrSize": 0, "type": "char"}
     dir = checkConstOverlap(cn)
 
 
 def p_string(p):
     "string :"
     global operandStack
-    cn = {"id": p[-1], "type": "string"}
+    cn = {"id": p[-1], "arrSize": 0, "type": "string"}
     dir = checkConstOverlap(cn)
 
 
 def p_int(p):
     "int :"
     global operandStack
-    cn = {"id": p[-1], "type": "int"}
+    cn = {"id": p[-1], "arrSize": 0, "type": "int"}
     dir = checkConstOverlap(cn)
 
 
 def p_float(p):
     "float :"
     global operandStack
-    cn = {"id": p[-1], "type": "float"}
+    cn = {"id": p[-1], "arrSize": 0, "type": "float"}
     dir = checkConstOverlap(cn)
 
 
@@ -667,7 +669,7 @@ def checkConstOverlap(cn):
     id = cn.get("id")
     if id not in cnTable:
         dir = cMemory.malloc(cn)
-        cnTable[id] = {"type": cn.get("type"), "dir": dir}
+        cnTable[id] = {"type": cn.get("type"), "arrSize": 0, "dir": dir}
     else:
         dir = cnTable[id].get("dir")
 
