@@ -8,8 +8,8 @@ TLIM = 52500
 
 class VirtualMachine:
     def __init__(self, fnTable, gMemory, lMemory, cMemory, tMemory) -> None:
-        self.varOffsetMap = {"int": 0, "float": 0, "char": 0}
-        self.tempOffsetMap = {"bool": 0, "int": 0, "float": 0, "char": 0, "string": 0}
+        # self.varOffsetMap = {"int": 0, "float": 0, "char": 0}
+        # self.tempOffsetMap = {"bool": 0, "int": 0, "float": 0, "char": 0, "string": 0}
         self.jumpStack = []
 
         self.fnTable = fnTable

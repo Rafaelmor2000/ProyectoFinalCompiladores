@@ -109,7 +109,7 @@ def t_CTE_I(t):
 
 
 def t_error(t):
-    print("Illegal character '%s' in line '%d'" % t.value[0] % t.lexer.lineno)
+    print(f"Illegal character {t.value[0]} in line {t.lexer.lineno}")
     t.lexer.skip(1)
 
 

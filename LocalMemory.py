@@ -76,7 +76,7 @@ class LocalMemory:
         self.floatCount = 0
         self.charCount = 0
 
-        return
+        return reqMem
 
     # Assign space and initialize local variables
     def era(self, reqMem):
