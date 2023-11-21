@@ -185,7 +185,6 @@ class LocalMemory:
             sys.exit()
 
         elif dir < LOCALFLOAT:
-            print(dir, LOCALINT, self.varOffsetMap["int"])
             self.intList[dir - LOCALINT + self.varOffsetMap["int"]] = value
 
         elif dir < LOCALCHAR:

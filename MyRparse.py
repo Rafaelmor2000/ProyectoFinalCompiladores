@@ -277,6 +277,9 @@ def p_return(p):
     elif aux.get("type") == fnTable[funcID].get("type"):
         newQuad = Quad("RETURN", EMPTY, EMPTY, aux.get("dir"))
         quadList.append(newQuad)
+        # operandStack.append(aux)
+        # genTemp(aux.get("type"))
+        # assignment()
 
     else:
         print(f"Type mismatch on return for function {funcID}")

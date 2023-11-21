@@ -1,0 +1,12 @@
+program fibonacci;
+vars 
+int n, i, total;
+main(){
+    read(n);
+    total = 1;
+    for i = 1 to n do{
+        total = i * total;
+        write(total);
+    }
+    write(total);
+}

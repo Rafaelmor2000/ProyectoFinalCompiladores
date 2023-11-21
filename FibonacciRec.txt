@@ -1,23 +1,25 @@
 program fibonacciRec;
 vars
-int input, output;
+int i, input, output;
 
-function int fib(int i)
+function int fib(int n)
 vars 
 int uno, dos;
 {
-    if (i <= 1) then {
-        return(i);
+    if (n <= 1) then {
+        return(n);
     }
-    else {
-        uno = fib(i - 1);
-        dos = fib(i - 2);
+    else{
+        uno = fib(n - 1);
+        dos = fib(n - 2);
         return(uno + dos);
     }
 }
 
 main(){
     read(input);
-    output = fib(input);
-    write("solution is ", output);
+    for i = 0 to input do {
+        output = fib(input);
+        write("pos ", i ," is ", output);
+    }
 }

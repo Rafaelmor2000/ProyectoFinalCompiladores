@@ -1,0 +1,24 @@
+program fibonacci;
+vars 
+int n, total;
+
+function int fac(int x)
+vars
+int aux;
+{
+    if (x <= 1) then {
+        return(1);
+    }
+    else{
+        aux = fac(x - 1);
+        write(aux * x);
+        return(aux * x);
+    }
+}
+
+
+main(){
+    read(n);
+    total = fac(n);
+    write(total);
+}

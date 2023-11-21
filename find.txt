@@ -1,0 +1,22 @@
+program fibonacci;
+vars 
+int i, output, target, array[10];
+main(){
+    for i = 0 to 9 do{
+        array[i] =  i * i;
+    }
+    read(target);
+    output = -1;
+    for i = 0 to 9 do{
+        if (array[i] == target) then {
+            output = i;
+            i = 11;
+        }
+    }
+    if (output == -1) then {
+        write("target was not found");
+    }
+    else{
+        write("target found at index ", output);
+    }
+}
