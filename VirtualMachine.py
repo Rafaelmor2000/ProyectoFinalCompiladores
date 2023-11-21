@@ -73,12 +73,25 @@ class VirtualMachine:
                 elif quad.operator == "ENDFUNC":
                     reqTemps = self.fnTable[quad.temp]["reqTemps"]
                     reqVars = self.fnTable[quad.temp]["reqVars"]
+                    print(
+                        self.lMemory.intList,
+                        self.lMemory.floatList,
+                        self.lMemory.charList,
+                        self.lMemory.varOffsetMap,
+                        reqVars,
+                    )
                     self.lMemory.pop(reqVars)
                     self.tMemory.pop(reqTemps)
                     curr = self.jumpStack.pop()
                     self.funcStack.pop()
                     self.params = []
-
+                    print(
+                        self.lMemory.intList,
+                        self.lMemory.floatList,
+                        self.lMemory.charList,
+                        self.lMemory.varOffsetMap,
+                        reqVars,
+                    )
                 elif quad.operator == "GOSUB":
                     self.jumpStack.append(curr)
                     curr = quad.temp - 1

@@ -237,6 +237,22 @@ class TempMemory:
         strings = reqMem.get("string")
         self.lStringCount -= strings
 
+        self.tempOffsetMap["bool"] -= bools
+        if self.tempOffsetMap["bool"] < 0:
+            self.tempOffsetMap["bool"] = 0
+        self.tempOffsetMap["int"] -= ints
+        if self.tempOffsetMap["int"] < 0:
+            self.tempOffsetMap["int"] = 0
+        self.tempOffsetMap["float"] -= floats
+        if self.tempOffsetMap["float"] < 0:
+            self.tempOffsetMap["float"] = 0
+        self.tempOffsetMap["char"] -= chars
+        if self.tempOffsetMap["char"] < 0:
+            self.tempOffsetMap["char"] = 0
+        self.tempOffsetMap["string"] -= strings
+        if self.tempOffsetMap["string"] < 0:
+            self.tempOffsetMap["string"] = 0
+
         self.lBoolList = self.lBoolList[:-bools]
         self.lIntList = self.lIntList[:-ints]
         self.lFloatList = self.lFloatList[:-floats]

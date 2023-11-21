@@ -122,7 +122,7 @@ def p_parameters(p):
     fnTable[funcID]["params"] = paramCounter
 
     while paramCounter > 0:
-        temp = operandStack.pop()
+        temp = operandStack.pop(-paramCounter)
         currType = temp[1]
         checkVarOverlap(temp[0], temp[2])
         paramCounter = paramCounter - 1
@@ -223,9 +223,8 @@ def p_call(p):
 
     keys = list(fnTable[id]["vars"])
     while paramCounter > 0:
-        parameter = operandStack.pop()
+        parameter = operandStack.pop(-paramCounter)
         key = keys[params - paramCounter]
-        print(parameter, fnTable[id]["vars"][key])
         if parameter.get("type") == fnTable[id]["vars"][key].get(
             "type"
         ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
