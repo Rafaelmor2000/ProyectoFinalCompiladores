@@ -1,19 +1,17 @@
 program area;
 vars
-int ancho, largo, otro;
-int alto[5];
+int ancho, otro;
+int alto[5], largo[6];
 int i, algo;
 char uno, dos;
 
 main()
 {
-    ancho = 5;
-    read(uno, dos);
-    write(uno," ", dos);
-    largo = 1 * 2 * 3;
-    for i = -2 to 0 do {
+    
+    for i = 0 to 4 do {
         alto[i] = i;
-        write(alto[i]);
+        largo[i+1] = alto[i] + 1;
+        write(largo[i]);
     }
 
     write("el area del rectangulo es: ", ancho / largo > 2 * (ancho + largo) & true);

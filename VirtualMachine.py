@@ -146,6 +146,8 @@ class VirtualMachine:
         return value
 
     def getParam(self, dir):
+        dir = self.getPointer(dir)
+
         if dir < GLOBALLIM:
             value = self.gMemory.getValue(dir)
         elif dir < LOCALLIM:

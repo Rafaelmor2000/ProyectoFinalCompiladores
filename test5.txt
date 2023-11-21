@@ -12,12 +12,12 @@ int i;
         write(arr[i], j);
     }
     if (j <= 5) then {
-        a(arr, j);
+        a(arr, arr[i]);
     }
 }
 
 main(){
-    a(array, 2);
+    a(array, array[0]);
 
     a(array, 4);
 }

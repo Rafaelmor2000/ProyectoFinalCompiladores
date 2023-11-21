@@ -193,17 +193,6 @@ def p_assignment(p):
     assignment()
 
 
-def assignment():
-    temp = operandStack.pop()
-    variable = operandStack.pop()
-    if temp.get("type") == variable.get("type"):
-        newQuad = Quad("=", temp, EMPTY, variable.get("dir"))
-        quadList.append(newQuad)
-    else:
-        print(f"Type mismatch caused by = on {temp.get('id')} and {variable.get('id')}")
-        sys.exit()
-
-
 def p_assignmentp(p):
     """assignmentp : expression
     | call"""
@@ -271,13 +260,9 @@ def p_return(p):
         print(f"Cannot have return on function main")
         sys.exit()
 
-    # elif aux.get("type") != "void" and fnTable[funcID].get("type") != "void":
     elif aux.get("type") == fnTable[funcID].get("type"):
         newQuad = Quad("RETURN", EMPTY, EMPTY, aux.get("dir"))
         quadList.append(newQuad)
-        # operandStack.append(aux)
-        # genTemp(aux.get("type"))
-        # assignment()
 
     else:
         print(f"Type mismatch on return for function {funcID}")
@@ -590,6 +575,19 @@ def p_error(p):
     sys.exit()
 
 
+# generate quad to save last element of the operand stack into the second last
+def assignment():
+    temp = operandStack.pop()
+    variable = operandStack.pop()
+    if temp.get("type") == variable.get("type"):
+        newQuad = Quad("=", temp, EMPTY, variable.get("dir"))
+        quadList.append(newQuad)
+    else:
+        print(f"Type mismatch caused by = on {temp.get('id')} and {variable.get('id')}")
+        sys.exit()
+
+
+# Verify if a variable has already been declared, if not, add to fnTable
 def checkVarOverlap(id, arrSize):
     global fnTable
     overlap = False
@@ -613,6 +611,7 @@ def checkVarOverlap(id, arrSize):
         sys.exit()
 
 
+# verify id has been declared, append to operand stack and return type
 def findIdType(id):
     global operandStack
     idType = "error"
@@ -641,6 +640,7 @@ def findIdType(id):
         sys.exit()
 
 
+# verify if function has been declared, if not, create variable to store returns and add to fnTable
 def checkFuncOverlap():
     global fnTable, funcID
     if funcID in fnTable:
@@ -655,6 +655,7 @@ def checkFuncOverlap():
             funcID = id
 
 
+# Verify function exists in fnTable, return function data
 def findFunc(func):
     global funcID
     if func in fnTable:
@@ -668,6 +669,7 @@ def findFunc(func):
         sys.exit()
 
 
+# append constand to operand stack, add to cnTable if it does not exist yet
 def checkConstOverlap(cn):
     global cnTable
     id = cn.get("id")
@@ -682,6 +684,7 @@ def checkConstOverlap(cn):
     # return dir
 
 
+# create quad for simple operations
 def genQuad(operator):
     global operandStack, quadList, tempCont, currType
     operand2 = operandStack.pop()
@@ -699,6 +702,7 @@ def genQuad(operator):
         sys.exit()
 
 
+# generate new temp and add to operand stack
 def genTemp(tempType):
     global tempCont
     temp = "temp" + str(tempCont)
@@ -738,11 +742,6 @@ if __name__ == "__main__":
         print(cont, str(quad))
         cont = cont + 1
 
-    # for operand in operandStack:
-    #     print(str(operand))
-
-    # for jump in jumpStack:
-    #     print(str(jump))
-
+    # inicializar y correr Maquina virtual
     vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
     vm.run(quadList)
