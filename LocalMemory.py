@@ -189,3 +189,30 @@ class LocalMemory:
 
         elif dir < LIM:
             self.charList[dir - CHAR + self.varOffsetMap["char"]] = value
+
+    def read(self, dir, value):
+        if dir < INT or dir >= LIM:
+            print("Invalid direction for variable")
+            sys.exit()
+
+        elif dir < FLOAT:
+            try:
+                int(value)
+            except:
+                print(f"Input value {value} is not of type int")
+                sys.exit()
+            self.intList[dir - INT + self.varOffsetMap["int"]] = value
+
+        elif dir < CHAR:
+            try:
+                float(value)
+            except:
+                print(f"Input value {value} is not of type float")
+                sys.exit()
+            self.floatList[dir - FLOAT + self.varOffsetMap["float"]] = value
+
+        elif dir < LIM:
+            if len(value) > 1:
+                print(f"Input value {value} is not of type char")
+            else:
+                self.charList[dir - CHAR + self.varOffsetMap["char"]] = value

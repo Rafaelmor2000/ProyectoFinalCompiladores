@@ -36,8 +36,18 @@ class VirtualMachine:
                         curr = quad.temp - 1
 
                 elif quad.operator == "PRINT":
-                    print(self.getValue(quad.temp), end=" ")
+                    print(self.getValue(quad.temp), end="")
                     # print(self.getValue(quad.temp))
+
+                elif quad.operator == "READ":
+                    value = input()
+                    dir = self.getPointer(quad.temp)
+
+                    if dir < GLOBALLIM:
+                        self.gMemory.read(dir, value)
+
+                    elif dir < LOCALLIM:
+                        self.lMemory.read(dir, value)
 
                 elif quad.operator == "VER":
                     min = 0
