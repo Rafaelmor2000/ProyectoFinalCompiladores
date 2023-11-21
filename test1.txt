@@ -10,9 +10,9 @@ main()
     ancho = 5.0;
     largo = -2.69 - 5;
     area = ancho/largo;
-    for i = 5 to 1 do {
-        for j = 1 to 5 do{
-            write("General Kenobi");
+    for i = 1 to 2 do {
+        for j = 1 to 3 do{
+            write(i," ","General", "Kenobi");
         }
         write("the fun begins");
     }

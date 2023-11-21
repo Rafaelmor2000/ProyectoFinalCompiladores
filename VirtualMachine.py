@@ -4,11 +4,12 @@ from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
 
 class VirtualMachine:
-    def __init__(self, fnTable, gMemory, lMemory, cMemory, tMemory) -> None:
+    def __init__(self, programID, fnTable, gMemory, lMemory, cMemory, tMemory) -> None:
         self.jumpStack = []
         self.funcStack = []
         self.params = []
 
+        self.programID = programID
         self.fnTable = fnTable
         self.gMemory = gMemory
         self.lMemory = lMemory
@@ -17,10 +18,10 @@ class VirtualMachine:
 
     # execute quads from quadlist
     def run(self, quadList):
-        curr = 0
-        while quadList[curr].operator != "DONE":
-            quad = quadList[curr]
-            # print(quad)
+        self.curr = 0
+        while quadList[self.curr].operator != "DONE":
+            quad = quadList[self.curr]
+            print(quad)
             if quad.operand2 == None:
                 # execute more complex operations
                 if quad.operator == "=":
@@ -28,12 +29,12 @@ class VirtualMachine:
                     self.saveValue(quad.temp, op1)
 
                 elif quad.operator == "GOTO":
-                    curr = quad.temp - 1
+                    self.curr = quad.temp - 1
 
                 elif quad.operator == "GOTOF":
                     op1 = self.getValue(quad.operand1)
                     if not op1:
-                        curr = quad.temp - 1
+                        self.curr = quad.temp - 1
 
                 elif quad.operator == "PRINT":
                     print(self.getValue(quad.temp), end="")
@@ -58,8 +59,8 @@ class VirtualMachine:
                         sys.exit()
 
                 elif quad.operator == "ERA":
-                    reqTemps = self.fnTable[quad.temp]["reqTemps"]
-                    reqVars = self.fnTable[quad.temp]["reqVars"]
+                    reqTemps = self.fnTable[quad.temp].get("reqTemps")
+                    reqVars = self.fnTable[quad.temp].get("reqVars")
 
                     self.lMemory.era(reqVars)
                     self.tMemory.era(reqTemps)
@@ -82,33 +83,20 @@ class VirtualMachine:
                         value = self.getParam(quad.operand1)
                         self.saveValue(dir, value)
 
+                elif quad.operator == "RETURN":
+                    dir = self.fnTable[self.programID]["vars"][self.funcStack[-1]].get(
+                        "dir"
+                    )
+                    value = self.getValue(quad.temp)
+                    self.saveValue(dir, value)
+                    self.exitFunc()
+
                 elif quad.operator == "ENDFUNC":
-                    reqTemps = self.fnTable[quad.temp]["reqTemps"]
-                    reqVars = self.fnTable[quad.temp]["reqVars"]
-                    # print(
-                    #     self.lMemory.varOffsetMap,
-                    #     reqVars,
-                    # )
+                    self.exitFunc()
 
-                    self.lMemory.pop(reqVars)
-                    self.tMemory.pop(reqTemps)
-                    curr = self.jumpStack.pop()
-                    self.funcStack.pop()
-                    if len(self.funcStack) > 0:
-                        reqTemps = self.fnTable[self.funcStack[-1]]["reqTemps"]
-                        reqVars = self.fnTable[self.funcStack[-1]]["reqVars"]
-                        self.lMemory.revertOffset(reqVars)
-                        self.tMemory.revertOffset(reqTemps)
-
-                    self.params = []
-
-                    # print(
-                    #     self.lMemory.varOffsetMap,
-                    #     reqVars,
-                    # )
                 elif quad.operator == "GOSUB":
-                    self.jumpStack.append(curr)
-                    curr = quad.temp - 1
+                    self.jumpStack.append(self.curr)
+                    self.curr = quad.temp - 1
 
             else:
                 # execute simple operation
@@ -117,7 +105,7 @@ class VirtualMachine:
                 res = self.do(quad.operator, op1, op2)
                 self.saveValue(quad.temp, res)
 
-            curr += 1
+            self.curr += 1
 
     # return value from appropriate memory direction
     def getValue(self, dir):
@@ -200,6 +188,23 @@ class VirtualMachine:
             dir = int(dir[1:])
             dir = self.getValue(dir)
         return dir
+
+    def exitFunc(self):
+        func = self.funcStack.pop()
+
+        reqTemps = self.fnTable[func]["reqTemps"]
+        reqVars = self.fnTable[func]["reqVars"]
+
+        self.lMemory.pop(reqVars)
+        self.tMemory.pop(reqTemps)
+        self.curr = self.jumpStack.pop()
+        if len(self.funcStack) > 0:
+            reqTemps = self.fnTable[self.funcStack[-1]]["reqTemps"]
+            reqVars = self.fnTable[self.funcStack[-1]]["reqVars"]
+            self.lMemory.revertOffset(reqVars)
+            self.tMemory.revertOffset(reqTemps)
+
+        self.params = []
 
     # execute simple expressions
     def do(self, operator, op1, op2):

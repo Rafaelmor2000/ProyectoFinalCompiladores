@@ -3,11 +3,13 @@ vars
 int ancho, largo, otro;
 int alto[5];
 int i, algo;
+char uno, dos;
 
 main()
 {
     ancho = 5;
-    read(otro, largo);
+    read(uno, dos);
+    write(uno," ", dos);
     largo = 1 * 2 * 3;
     for i = -2 to 0 do {
         alto[i] = i;

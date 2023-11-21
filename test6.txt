@@ -1,0 +1,14 @@
+program test;
+vars
+int uno, dos;
+
+function int a(int i)
+{
+    return(i * 2);
+}
+
+main(){
+    uno = a(2);
+    dos = a(5);
+    write(uno," ",dos);
+}

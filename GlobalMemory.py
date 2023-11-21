@@ -110,7 +110,7 @@ class GlobalMemory:
 
         elif dir < FLOAT:
             try:
-                int(value)
+                value = int(value)
             except:
                 print(f"Input value {value} is not of type int")
                 sys.exit()
@@ -118,7 +118,7 @@ class GlobalMemory:
 
         elif dir < CHAR:
             try:
-                float(value)
+                value = float(value)
             except:
                 print(f"Input value {value} is not of type float")
                 sys.exit()
@@ -127,5 +127,6 @@ class GlobalMemory:
         elif dir < LIM:
             if len(value) > 1:
                 print(f"Input value {value} is not of type char")
+                sys.exit()
             else:
                 self.charList[dir - CHAR] = value

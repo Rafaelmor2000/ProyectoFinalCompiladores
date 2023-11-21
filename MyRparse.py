@@ -241,6 +241,7 @@ def p_call(p):
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
     quadList.append(newQuad)
 
+    print(currType)
     if currType != "void":
         genTemp(currType)
         temp = operandStack[-1]
@@ -704,7 +705,7 @@ def genTemp(tempType):
     tempCont += 1
     isLocal = programID != funcID
     dir = tMemory.malloc(tempType, isLocal)
-    operandStack.append({"id": temp, "type": tempType, "dir": dir})
+    operandStack.append({"id": temp, "type": tempType, "dir": dir, "arrSize": 0})
 
 
 # Build the parser
@@ -743,5 +744,5 @@ if __name__ == "__main__":
     # for jump in jumpStack:
     #     print(str(jump))
 
-    vm = VirtualMachine(fnTable, gMemory, lMemory, cMemory, tMemory)
+    vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
     vm.run(quadList)

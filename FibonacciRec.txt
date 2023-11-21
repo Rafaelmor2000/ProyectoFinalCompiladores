@@ -1,0 +1,23 @@
+program fibonacciRec;
+vars
+int input, output;
+
+function int fib(int i)
+vars 
+int uno, dos;
+{
+    if (i <= 1) then {
+        return(i);
+    }
+    else {
+        uno = fib(i - 1);
+        dos = fib(i - 2);
+        return(uno - dos);
+    }
+}
+
+main(){
+    read(input);
+    output = fib(input);
+    write(output);
+}

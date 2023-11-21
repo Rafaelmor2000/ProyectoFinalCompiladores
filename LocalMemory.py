@@ -2,11 +2,6 @@ import sys
 
 from MemoryMap import LOCALCHAR, LOCALFLOAT, LOCALINT, LOCALLIM
 
-INT = LOCALINT
-FLOAT = LOCALFLOAT
-CHAR = LOCALCHAR
-LIM = LOCALLIM
-
 
 class LocalMemory:
     def __init__(self) -> None:
@@ -22,10 +17,10 @@ class LocalMemory:
         varType = var.get("type")
 
         if varType == "int":
-            dir = INT
+            dir = LOCALINT
             arrSize = int(var.get("arrSize"))
             dir += self.intCount + arrSize
-            if dir < INT or dir >= FLOAT:
+            if dir < LOCALINT or dir >= LOCALFLOAT:
                 print("no local memory for int variables available")
                 sys.exit()
             else:
@@ -36,11 +31,11 @@ class LocalMemory:
                     self.intCount += 1
 
         elif varType == "float":
-            dir = FLOAT
+            dir = LOCALFLOAT
             arrSize = int(var.get("arrSize"))
             dir += self.floatCount + arrSize
 
-            if dir < FLOAT or dir >= CHAR:
+            if dir < LOCALFLOAT or dir >= LOCALCHAR:
                 print("no local memory for float variables available")
                 sys.exit()
 
@@ -52,10 +47,10 @@ class LocalMemory:
                     self.floatCount += 1
 
         else:
-            dir = CHAR
+            dir = LOCALCHAR
             arrSize = int(var.get("arrSize"))
             dir += self.charCount + arrSize
-            if dir < CHAR or dir >= LIM:
+            if dir < LOCALCHAR or dir >= LOCALLIM:
                 print("no local memory for char variables available")
                 sys.exit()
 
@@ -97,21 +92,21 @@ class LocalMemory:
         self.charCount += chars
 
         # evaluate if there is enough space available, initialize and make space for function.
-        if self.intCount >= FLOAT:
+        if self.intCount >= LOCALFLOAT:
             print("no local memory for int variables available")
             sys.exit()
         else:
             for i in range(ints):
                 self.intList.append(0)
 
-        if self.floatCount >= CHAR:
+        if self.floatCount >= LOCALCHAR:
             print("no local memory for float variables available")
             sys.exit()
         else:
             for i in range(floats):
                 self.floatList.append(0.0)
 
-        if self.charCount >= LIM:
+        if self.charCount >= LOCALLIM:
             print("no local memory for char variables available")
             sys.exit()
         else:
@@ -146,73 +141,76 @@ class LocalMemory:
         self.varOffsetMap["char"] -= chars
 
     def getValue(self, dir):
-        if dir < INT or dir >= LIM:
+        if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
             sys.exit()
-        elif dir < FLOAT:
-            return self.intList[dir - INT + self.varOffsetMap["int"]]
+        elif dir < LOCALFLOAT:
+            return self.intList[dir - LOCALINT + self.varOffsetMap["int"]]
 
-        elif dir < CHAR:
-            return self.floatList[dir - FLOAT + self.varOffsetMap["float"]]
+        elif dir < LOCALCHAR:
+            return self.floatList[dir - LOCALFLOAT + self.varOffsetMap["float"]]
 
-        elif dir < LIM:
-            return self.charList[dir - CHAR + self.varOffsetMap["char"]]
+        elif dir < LOCALLIM:
+            return self.charList[dir - LOCALCHAR + self.varOffsetMap["char"]]
 
     def getParam(self, dir, reqMem):
-        if dir < INT or dir >= LIM:
+        if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
-            return self.intList[dir - INT + self.varOffsetMap["int"] - reqMem["int"]]
-
-        elif dir < CHAR:
-            return self.floatList[
-                dir - FLOAT + self.varOffsetMap["float"] - reqMem["float"]
+        elif dir < LOCALFLOAT:
+            return self.intList[
+                dir - LOCALINT + self.varOffsetMap["int"] - reqMem["int"]
             ]
 
-        elif dir < LIM:
+        elif dir < LOCALCHAR:
+            return self.floatList[
+                dir - LOCALFLOAT + self.varOffsetMap["float"] - reqMem["float"]
+            ]
+
+        elif dir < LOCALLIM:
             return self.charList[
-                dir - CHAR + self.varOffsetMap["char"] - reqMem["char"]
+                dir - LOCALCHAR + self.varOffsetMap["char"] - reqMem["char"]
             ]
 
     def saveValue(self, dir, value):
-        if dir < INT or dir >= LIM:
+        if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
-            self.intList[dir - INT + self.varOffsetMap["int"]] = value
+        elif dir < LOCALFLOAT:
+            self.intList[dir - LOCALINT + self.varOffsetMap["int"]] = value
 
-        elif dir < CHAR:
-            self.floatList[dir - FLOAT + self.varOffsetMap["float"]] = value
+        elif dir < LOCALCHAR:
+            self.floatList[dir - LOCALFLOAT + self.varOffsetMap["float"]] = value
 
-        elif dir < LIM:
-            self.charList[dir - CHAR + self.varOffsetMap["char"]] = value
+        elif dir < LOCALLIM:
+            self.charList[dir - LOCALCHAR + self.varOffsetMap["char"]] = value
 
     def read(self, dir, value):
-        if dir < INT or dir >= LIM:
+        if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
+        elif dir < LOCALFLOAT:
             try:
-                int(value)
+                value = int(value)
             except:
                 print(f"Input value {value} is not of type int")
                 sys.exit()
-            self.intList[dir - INT + self.varOffsetMap["int"]] = value
+            self.intList[dir - LOCALINT + self.varOffsetMap["int"]] = value
 
-        elif dir < CHAR:
+        elif dir < LOCALCHAR:
             try:
-                float(value)
+                value = float(value)
             except:
                 print(f"Input value {value} is not of type float")
                 sys.exit()
-            self.floatList[dir - FLOAT + self.varOffsetMap["float"]] = value
+            self.floatList[dir - LOCALFLOAT + self.varOffsetMap["float"]] = value
 
-        elif dir < LIM:
+        elif dir < LOCALLIM:
             if len(value) > 1:
                 print(f"Input value {value} is not of type char")
+                sys.exit()
             else:
-                self.charList[dir - CHAR + self.varOffsetMap["char"]] = value
+                self.charList[dir - LOCALCHAR + self.varOffsetMap["char"]] = value
