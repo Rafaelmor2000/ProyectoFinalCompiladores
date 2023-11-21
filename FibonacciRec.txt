@@ -12,12 +12,12 @@ int uno, dos;
     else {
         uno = fib(i - 1);
         dos = fib(i - 2);
-        return(uno - dos);
+        return(uno + dos);
     }
 }
 
 main(){
     read(input);
     output = fib(input);
-    write(output);
+    write("solution is ", output);
 }

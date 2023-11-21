@@ -4,7 +4,11 @@ int uno, dos;
 
 function int a(int i)
 {
-    return(i * 2);
+    
+    if(i < 10) then{
+        i = a(i * 2);
+    }
+    return(i);
 }
 
 main(){

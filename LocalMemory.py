@@ -137,8 +137,14 @@ class LocalMemory:
         chars = reqMem.get("char")
 
         self.varOffsetMap["int"] -= ints
+        if self.varOffsetMap["int"] < 0:
+            self.varOffsetMap["int"] = 0
         self.varOffsetMap["float"] -= floats
+        if self.varOffsetMap["float"] < 0:
+            self.varOffsetMap["float"] = 0
         self.varOffsetMap["char"] -= chars
+        if self.varOffsetMap["char"] < 0:
+            self.varOffsetMap["char"] = 0
 
     def getValue(self, dir):
         if dir < LOCALINT or dir >= LOCALLIM:
@@ -179,6 +185,7 @@ class LocalMemory:
             sys.exit()
 
         elif dir < LOCALFLOAT:
+            print(dir, LOCALINT, self.varOffsetMap["int"])
             self.intList[dir - LOCALINT + self.varOffsetMap["int"]] = value
 
         elif dir < LOCALCHAR:

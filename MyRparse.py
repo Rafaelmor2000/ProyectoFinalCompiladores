@@ -241,7 +241,6 @@ def p_call(p):
     newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
     quadList.append(newQuad)
 
-    print(currType)
     if currType != "void":
         genTemp(currType)
         temp = operandStack[-1]
