@@ -150,6 +150,8 @@ class VirtualMachine:
             print(f"{dir} is an invalid memory direction")
             sys.exit()
 
+        return value
+
     # save value to appropriate direction
     def saveValue(self, dir, value):
         dir = self.getPointer(dir)

@@ -138,11 +138,13 @@ class LocalMemory:
         if dir < INT or dir >= LIM:
             print("Invalid direction for variable")
             sys.exit()
-
         elif dir < FLOAT:
             return self.intList[dir - INT + self.varOffsetMap["int"]]
 
         elif dir < CHAR:
+            print(self.floatList)
+            print(self.varOffsetMap)
+            print(dir - FLOAT + self.varOffsetMap["float"])
             return self.floatList[dir - FLOAT + self.varOffsetMap["float"]]
 
         elif dir < LIM:
