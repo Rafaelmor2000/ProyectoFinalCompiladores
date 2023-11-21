@@ -25,8 +25,9 @@ main()
     read(ancho);
     largo = -2.0;
     triangulo(ancho, largo);
-    while(largo > -2) do {
+    while(largo >= -2) do {
         largo = triangulo(ancho, largo);
-        write("el area del rectangulo es: ", ancho * largo);
+        largo = 5.1;
+        write("el area del rectangulo es: ", largo);
     }
 }

@@ -8,7 +8,7 @@ int i;
 {
     j = j+1;
     for i = 0 to 4 do{
-        array[i] = i+j;
+        array[i] = j;
         write(array[i]);
     }
     if (j <= 5) then {

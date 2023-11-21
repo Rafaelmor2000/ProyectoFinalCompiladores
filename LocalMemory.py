@@ -127,15 +127,7 @@ class LocalMemory:
         chars = reqMem.get("char")
         self.charCount -= chars
 
-        self.varOffsetMap["int"] -= ints
-        if self.varOffsetMap["int"] < 0:
-            self.varOffsetMap["int"] = 0
-        self.varOffsetMap["float"] -= floats
-        if self.varOffsetMap["float"] < 0:
-            self.varOffsetMap["float"] = 0
-        self.varOffsetMap["char"] -= chars
-        if self.varOffsetMap["char"] < 0:
-            self.varOffsetMap["char"] = 0
+        self.revertOffset(reqMem)
 
         if ints > 0:
             self.intList = self.intList[:-ints]
@@ -143,6 +135,15 @@ class LocalMemory:
             self.floatList = self.floatList[:-floats]
         if chars > 0:
             self.charListharList = self.charList[:-chars]
+
+    def revertOffset(self, reqMem):
+        ints = reqMem.get("int")
+        floats = reqMem.get("float")
+        chars = reqMem.get("char")
+
+        self.varOffsetMap["int"] -= ints
+        self.varOffsetMap["float"] -= floats
+        self.varOffsetMap["char"] -= chars
 
     def getValue(self, dir):
         if dir < INT or dir >= LIM:
@@ -152,9 +153,6 @@ class LocalMemory:
             return self.intList[dir - INT + self.varOffsetMap["int"]]
 
         elif dir < CHAR:
-            print(self.floatList)
-            print(self.varOffsetMap)
-            print(dir, FLOAT, self.varOffsetMap["float"])
             return self.floatList[dir - FLOAT + self.varOffsetMap["float"]]
 
         elif dir < LIM:

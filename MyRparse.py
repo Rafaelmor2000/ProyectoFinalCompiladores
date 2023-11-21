@@ -312,6 +312,9 @@ def p_write(p):
         newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("dir"))
         quadList.append(newQuad)
         paramCounter = paramCounter - 1
+    checkConstOverlap({"type": "string", "id": "\n"})
+    newQuad = Quad("PRINT", EMPTY, EMPTY, operandStack.pop().get("dir"))
+    quadList.append(newQuad)
 
 
 def p_initParams(p):
@@ -544,7 +547,8 @@ def p_char(p):
 def p_string(p):
     "string :"
     global operandStack
-    cn = {"id": p[-1], "arrSize": 0, "type": "string"}
+    string = p[-1]
+    cn = {"id": string[1:-1], "arrSize": 0, "type": "string"}
     dir = checkConstOverlap(cn)
 
 

@@ -20,7 +20,7 @@ class VirtualMachine:
         curr = 0
         while quadList[curr].operator != "DONE":
             quad = quadList[curr]
-            print(quad)
+            # print(quad)
             if quad.operand2 == None:
                 # execute more complex operations
                 if quad.operator == "=":
@@ -36,7 +36,8 @@ class VirtualMachine:
                         curr = quad.temp - 1
 
                 elif quad.operator == "PRINT":
-                    print(self.getValue(quad.temp))
+                    print(self.getValue(quad.temp), end=" ")
+                    # print(self.getValue(quad.temp))
 
                 elif quad.operator == "VER":
                     min = 0
@@ -49,6 +50,7 @@ class VirtualMachine:
                 elif quad.operator == "ERA":
                     reqTemps = self.fnTable[quad.temp]["reqTemps"]
                     reqVars = self.fnTable[quad.temp]["reqVars"]
+
                     self.lMemory.era(reqVars)
                     self.tMemory.era(reqTemps)
 
@@ -73,25 +75,27 @@ class VirtualMachine:
                 elif quad.operator == "ENDFUNC":
                     reqTemps = self.fnTable[quad.temp]["reqTemps"]
                     reqVars = self.fnTable[quad.temp]["reqVars"]
-                    print(
-                        self.lMemory.intList,
-                        self.lMemory.floatList,
-                        self.lMemory.charList,
-                        self.lMemory.varOffsetMap,
-                        reqVars,
-                    )
+                    # print(
+                    #     self.lMemory.varOffsetMap,
+                    #     reqVars,
+                    # )
+
                     self.lMemory.pop(reqVars)
                     self.tMemory.pop(reqTemps)
                     curr = self.jumpStack.pop()
                     self.funcStack.pop()
+                    if len(self.funcStack) > 0:
+                        reqTemps = self.fnTable[self.funcStack[-1]]["reqTemps"]
+                        reqVars = self.fnTable[self.funcStack[-1]]["reqVars"]
+                        self.lMemory.revertOffset(reqVars)
+                        self.tMemory.revertOffset(reqTemps)
+
                     self.params = []
-                    print(
-                        self.lMemory.intList,
-                        self.lMemory.floatList,
-                        self.lMemory.charList,
-                        self.lMemory.varOffsetMap,
-                        reqVars,
-                    )
+
+                    # print(
+                    #     self.lMemory.varOffsetMap,
+                    #     reqVars,
+                    # )
                 elif quad.operator == "GOSUB":
                     self.jumpStack.append(curr)
                     curr = quad.temp - 1

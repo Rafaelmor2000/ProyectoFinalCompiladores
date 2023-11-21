@@ -237,27 +237,24 @@ class TempMemory:
         strings = reqMem.get("string")
         self.lStringCount -= strings
 
-        self.tempOffsetMap["bool"] -= bools
-        if self.tempOffsetMap["bool"] < 0:
-            self.tempOffsetMap["bool"] = 0
-        self.tempOffsetMap["int"] -= ints
-        if self.tempOffsetMap["int"] < 0:
-            self.tempOffsetMap["int"] = 0
-        self.tempOffsetMap["float"] -= floats
-        if self.tempOffsetMap["float"] < 0:
-            self.tempOffsetMap["float"] = 0
-        self.tempOffsetMap["char"] -= chars
-        if self.tempOffsetMap["char"] < 0:
-            self.tempOffsetMap["char"] = 0
-        self.tempOffsetMap["string"] -= strings
-        if self.tempOffsetMap["string"] < 0:
-            self.tempOffsetMap["string"] = 0
-
         self.lBoolList = self.lBoolList[:-bools]
         self.lIntList = self.lIntList[:-ints]
         self.lFloatList = self.lFloatList[:-floats]
         self.lCharList = self.lCharList[:-chars]
         self.lStringList = self.lStringList[:-strings]
+
+    def revertOffset(self, reqMem):
+        bools = reqMem.get("bool")
+        ints = reqMem.get("int")
+        floats = reqMem.get("float")
+        chars = reqMem.get("char")
+        strings = reqMem.get("string")
+
+        self.tempOffsetMap["bool"] -= bools
+        self.tempOffsetMap["int"] -= ints
+        self.tempOffsetMap["float"] -= floats
+        self.tempOffsetMap["char"] -= chars
+        self.tempOffsetMap["string"] -= strings
 
     # return value stored in memory direction
     def getValue(self, dir):
