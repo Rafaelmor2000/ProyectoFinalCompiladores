@@ -13,6 +13,12 @@ main()
         largo[i+1] = alto[i] + 1;
         write(largo[i]);
     }
+    i = 0;
+
+    while (alto[i] < 5) do {
+        write(i);
+        i = i + 1;
+    }
 
     write("el area del rectangulo es: ", ancho / largo > 2 * (ancho + largo) & true);
 }

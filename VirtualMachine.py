@@ -21,7 +21,7 @@ class VirtualMachine:
         self.curr = 0
         while quadList[self.curr].operator != "DONE":
             quad = quadList[self.curr]
-            # print(quad)
+            print(quad, end=" ")
             if quad.operand2 == None:
                 # execute more complex operations
                 if quad.operator == "=":
@@ -117,7 +117,7 @@ class VirtualMachine:
                 op2 = self.getValue(quad.operand2)
                 res = self.do(quad.operator, op1, op2)
                 self.saveValue(quad.temp, res)
-
+            print()
             self.curr += 1
 
     # return value from appropriate memory direction

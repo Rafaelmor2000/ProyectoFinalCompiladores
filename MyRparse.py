@@ -290,6 +290,7 @@ def p_readpp(p):
     | empty"""
 
 
+# Create quads to print everything in call in the same line, then to print newline
 def p_write(p):
     "write : WRITE initParams LPAREN writep RPAREN"
     global operandStack, paramCounter
@@ -303,6 +304,7 @@ def p_write(p):
     quadList.append(newQuad)
 
 
+# initialize parameters
 def p_initParams(p):
     "initParams :"
     global paramCounter
