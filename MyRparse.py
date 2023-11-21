@@ -247,9 +247,7 @@ def p_call(p):
         aux = fnTable[programID]["vars"][id]
         operandStack.append({"id": id, "type": aux.get("type"), "dir": aux.get("dir")})
         assignment()
-        operandStack.append(
-            {"id": temp, "type": temp.get("type"), "dir": temp.get("dir")}
-        )
+        operandStack.append(temp)
 
 
 def p_callp(p):

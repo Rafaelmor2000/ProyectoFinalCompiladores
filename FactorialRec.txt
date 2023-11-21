@@ -11,8 +11,8 @@ int aux;
     }
     else{
         aux = fac(x - 1);
-        write(aux * x);
-        return(aux * x);
+        aux = aux * x;
+        return(aux);
     }
 }
 

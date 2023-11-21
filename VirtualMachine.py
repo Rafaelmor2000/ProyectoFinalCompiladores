@@ -21,7 +21,7 @@ class VirtualMachine:
         self.curr = 0
         while quadList[self.curr].operator != "DONE":
             quad = quadList[self.curr]
-            print(quad)
+            # print(quad)
             if quad.operand2 == None:
                 # execute more complex operations
                 if quad.operator == "=":
@@ -38,7 +38,6 @@ class VirtualMachine:
 
                 elif quad.operator == "PRINT":
                     print(self.getValue(quad.temp), end="")
-                    # print(self.getValue(quad.temp))
 
                 elif quad.operator == "READ":
                     value = input()
@@ -89,7 +88,21 @@ class VirtualMachine:
                     )
                     value = self.getValue(quad.temp)
                     self.saveValue(dir, value)
-                    self.exitFunc()
+
+                    func = self.funcStack.pop()
+
+                    reqTemps = self.fnTable[func]["reqTemps"]
+                    reqVars = self.fnTable[func]["reqVars"]
+
+                    self.lMemory.pop(reqVars)
+                    self.tMemory.pop(reqTemps)
+                    self.curr = self.jumpStack.pop()
+                    if len(self.funcStack) > 0:
+                        reqTemps = self.fnTable[self.funcStack[-1]]["reqTemps"]
+                        reqVars = self.fnTable[self.funcStack[-1]]["reqVars"]
+                        self.tMemory.revertOffset(reqTemps)
+
+                    self.params = []
 
                 elif quad.operator == "ENDFUNC":
                     self.exitFunc()
