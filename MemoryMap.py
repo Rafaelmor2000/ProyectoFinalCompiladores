@@ -1,3 +1,5 @@
+# Declaration of constants used for Memory mapping
+
 # Global variables:
 GLOBALINT = 10000
 GLOBALFLOAT = 11000

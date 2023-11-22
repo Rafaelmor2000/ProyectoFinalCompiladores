@@ -1,7 +1,7 @@
 program area;
 vars
 int ancho, otro;
-int alto[5], largo[6];
+float alto[5], largo[6];
 int i, algo;
 char uno, dos;
 
@@ -9,7 +9,7 @@ main()
 {
     
     for i = 0 to 4 do {
-        alto[i] = i;
+        alto[2.4] = i;
         largo[i+1] = alto[i] + 1;
         write(largo[i]);
     }

@@ -350,10 +350,12 @@ class TempMemory:
                 self.lBoolList[dir - LBOOL + self.tempOffsetMap["bool"]] = value
 
             elif dir < LFLOAT:
-                self.lIntList[dir - LINT + self.tempOffsetMap["int"]] = value
+                self.lIntList[dir - LINT + self.tempOffsetMap["int"]] = int(value)
 
             elif dir < LCHAR:
-                self.lFloatList[dir - LFLOAT + self.tempOffsetMap["float"]] = value
+                self.lFloatList[dir - LFLOAT + self.tempOffsetMap["float"]] = float(
+                    value
+                )
 
             elif dir < LSTRING:
                 self.lCharList[dir - LCHAR + self.tempOffsetMap["char"]] = value

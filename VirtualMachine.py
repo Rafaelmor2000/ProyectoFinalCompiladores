@@ -4,6 +4,7 @@ from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
 
 class VirtualMachine:
+    # initialize virtual machine
     def __init__(self, programID, fnTable, gMemory, lMemory, cMemory, tMemory) -> None:
         self.jumpStack = []
         self.funcStack = []
@@ -24,6 +25,7 @@ class VirtualMachine:
             print(quad, end=" ")
             if quad.operand2 == None:
                 # execute more complex operations
+
                 if quad.operator == "=":
                     op1 = self.getValue(quad.operand1)
                     self.saveValue(quad.temp, op1)
@@ -57,6 +59,7 @@ class VirtualMachine:
                         print(f"Error: Array index {op1} out of range")
                         sys.exit()
 
+                # Make space for function execution
                 elif quad.operator == "ERA":
                     reqTemps = self.fnTable[quad.temp].get("reqTemps")
                     reqVars = self.fnTable[quad.temp].get("reqVars")
@@ -68,6 +71,7 @@ class VirtualMachine:
                     keys = list(self.fnTable[self.funcStack[-1]]["vars"])
                     self.params = keys[: self.fnTable[self.funcStack[-1]]["params"]]
 
+                # Find param data, save to appropriate direction
                 elif quad.operator == "PARAM":
                     key = self.params[quad.temp]
                     arrSize = self.fnTable[self.funcStack[-1]]["vars"][key].get(
@@ -82,6 +86,7 @@ class VirtualMachine:
                         value = self.getParam(quad.operand1)
                         self.saveValue(dir, value)
 
+                # Exit function, adjust offsets
                 elif quad.operator == "RETURN":
                     dir = self.fnTable[self.programID]["vars"][self.funcStack[-1]].get(
                         "dir"
@@ -145,6 +150,7 @@ class VirtualMachine:
             sys.exit()
         return value
 
+    # return parameter value from appropriate direction
     def getParam(self, dir):
         dir = self.getPointer(dir)
 
@@ -185,7 +191,6 @@ class VirtualMachine:
     # save value to appropriate direction
     def saveValue(self, dir, value):
         dir = self.getPointer(dir)
-
         if dir < GLOBALLIM:
             self.gMemory.saveValue(dir, value)
         elif dir < LOCALLIM:
@@ -198,12 +203,16 @@ class VirtualMachine:
             print(f"{dir} is an invalid memory direction")
             sys.exit()
 
+    # return direction held in pointer value
     def getPointer(self, dir):
         if type(dir) == str:
             dir = int(dir[1:])
             dir = self.getValue(dir)
+
+        dir = int(dir)
         return dir
 
+    # clear memory no longer required, adjust offsets
     def exitFunc(self):
         func = self.funcStack.pop()
 
@@ -221,7 +230,7 @@ class VirtualMachine:
 
         self.params = []
 
-    # execute simple expressions
+    # execute simple expressions, return result
     def do(self, operator, op1, op2):
         if operator == "+":
             res = op1 + op2

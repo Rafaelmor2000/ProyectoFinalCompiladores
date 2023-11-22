@@ -1,5 +1,7 @@
 import sys
 
+from genericpath import isfile
+
 import MyRCube
 import MyRlex
 import ply.yacc as yacc
@@ -717,16 +719,19 @@ def genTemp(tempType):
 # Build the parser
 parser = yacc.yacc()
 
-# temporary input
+# get input
 if __name__ == "__main__":
     fileName = sys.argv[1]
 
-    inputFile = open(fileName, "r")
-    inputCode = inputFile.read()
-    inputFile.close()
-
-    parser.parse(inputCode)
-    print("All good!")
+    # Probar que exista archivo y abrirlo
+    if isfile(fileName):
+        inputFile = open(fileName, "r")
+        inputCode = inputFile.read()
+        inputFile.close()
+        parser.parse(inputCode)
+    else:
+        print("File does not exist")
+        sys.exit()
 
     # mostrar tabla de funciones
     for key in fnTable:
