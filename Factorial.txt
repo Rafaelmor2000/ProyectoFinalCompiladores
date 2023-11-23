@@ -6,7 +6,6 @@ main(){
     total = 1;
     for i = 1 to n do{
         total = i * total;
-        write(total);
     }
     write(total);
 }

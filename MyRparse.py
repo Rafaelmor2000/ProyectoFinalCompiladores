@@ -189,7 +189,6 @@ def p_statementspp(p):
 def p_voidCall(p):
     """voidCall : call
     | specCall"""
-    print(p[1])
     if p[1] in fnTable:
         if fnTable[p[1]].get("type") != "void":
             print(f"Return from function is not being saved")
@@ -765,9 +764,26 @@ def p_error(p):
 def assignment():
     temp = operandStack.pop()
     variable = operandStack.pop()
+    arrSize = variable.get("arrSize")
     if temp.get("type") == variable.get("type"):
-        newQuad = Quad("=", temp, EMPTY, variable.get("dir"))
-        quadList.append(newQuad)
+        if temp.get("arrSize") == arrSize:
+            if arrSize < 2:
+                newQuad = Quad("=", temp, EMPTY, variable.get("dir"))
+                quadList.append(newQuad)
+            else:
+                for i in range(arrSize):
+                    newQuad = Quad(
+                        "=",
+                        {"dir": temp.get("dir") + i},
+                        EMPTY,
+                        variable.get("dir") + i,
+                    )
+                    quadList.append(newQuad)
+        else:
+            print(
+                f"Mismatched size of arrays caused by = on {temp.get('id')} and {variable.get('id')}"
+            )
+            sys.exit()
     else:
         print(f"Type mismatch caused by = on {temp.get('id')} and {variable.get('id')}")
         sys.exit()

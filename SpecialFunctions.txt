@@ -1,6 +1,6 @@
 program test;
 vars
-int array[10], i;
+int array[10], arrC[10], i;
 float f, arrB[10];
 
 function void testOnFunc(int arr[10])
