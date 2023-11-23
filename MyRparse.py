@@ -14,6 +14,7 @@ from VirtualMachine import *
 
 tokens = MyRlex.tokens
 
+# funcion para determinar precedencia y asociatividad de expresiones
 precedence = (
     ("left", "AND", "OR"),
     ("nonassoc", "LTHAN", "GTHAN", "EQUALS", "DIFFERENCE", "LEQUAL", "GEQUAL"),
