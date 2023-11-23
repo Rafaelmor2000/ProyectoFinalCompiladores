@@ -1,0 +1,32 @@
+program test;
+vars
+int array[10], i;
+float f;
+
+function int normalFunc(int param1, int param2, int param3)
+{
+    write(param1," ", param2," ", param3);
+    return(1);
+}
+
+
+main(){
+    %load array
+    for i = 0 to 9 do {
+        array[i] = i;
+    }
+
+    normalFunc(1, 2, 3);
+
+    i = int(5.8);
+    write(i);
+    i = int(6.5);
+    write(i);
+
+    f = float(5);
+    write(f);
+
+    pow(1, 2.0);
+
+    write(array, array[5]);
+}

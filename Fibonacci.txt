@@ -1,0 +1,16 @@
+program func;
+vars
+int temp, next, actual, n, i;
+main(){
+    read(n);
+    if (n >= 1) then{
+        next = 1;
+    }
+    while (i <= n) do {
+        temp = actual;
+        actual = next;
+        next = temp + actual;
+        i = i + 1;
+    }
+    write("La posicion ", n, " es igual a ", temp);
+}

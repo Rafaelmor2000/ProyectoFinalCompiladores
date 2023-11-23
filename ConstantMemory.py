@@ -2,13 +2,6 @@ import sys
 
 from MemoryMap import CBOOL, CCHAR, CFLOAT, CINT, CLIM, CSTRING
 
-BOOL = CBOOL
-INT = CINT
-FLOAT = CFLOAT
-CHAR = CCHAR
-STRING = CSTRING
-LIM = CLIM
-
 
 class ConstantMemory:
     def __init__(self) -> None:
@@ -28,9 +21,9 @@ class ConstantMemory:
         value = var.get("id")
 
         if varType == "bool":
-            dir = BOOL
+            dir = CBOOL
             dir += self.boolCount
-            if dir < BOOL or dir >= INT:
+            if dir < CBOOL or dir >= CINT:
                 print("no memory available")
                 sys.exit()
             else:
@@ -38,9 +31,9 @@ class ConstantMemory:
                 self.boolList.append(value)
 
         elif varType == "int":
-            dir = INT
+            dir = CINT
             dir += self.intCount
-            if dir < INT or dir >= FLOAT:
+            if dir < CINT or dir >= CFLOAT:
                 print("no memory available")
                 sys.exit()
             else:
@@ -48,9 +41,9 @@ class ConstantMemory:
                 self.intList.append(int(value))
 
         elif varType == "float":
-            dir = FLOAT
+            dir = CFLOAT
             dir += self.floatCount
-            if dir < FLOAT or dir >= CHAR:
+            if dir < CFLOAT or dir >= CCHAR:
                 print("no memory available")
                 sys.exit()
 
@@ -59,9 +52,9 @@ class ConstantMemory:
                 self.floatList.append(float(value))
 
         elif varType == "char":
-            dir = CHAR
+            dir = CCHAR
             dir += self.charCount
-            if dir < CHAR or dir >= STRING:
+            if dir < CCHAR or dir >= CSTRING:
                 print("no memory available")
                 sys.exit()
 
@@ -70,9 +63,9 @@ class ConstantMemory:
                 self.charList.append(value)
 
         else:
-            dir = STRING
+            dir = CSTRING
             dir += self.stringCount
-            if dir < STRING or dir >= LIM:
+            if dir < CSTRING or dir >= CLIM:
                 print("no memory available")
                 sys.exit()
 
@@ -83,21 +76,21 @@ class ConstantMemory:
         return dir
 
     def getValue(self, dir):
-        if dir < BOOL or dir >= LIM:
+        if dir < CBOOL or dir >= CLIM:
             print("Invalid direction for temp")
             sys.exit()
 
-        elif dir < INT:
-            return self.boolList[dir - BOOL]
+        elif dir < CINT:
+            return self.boolList[dir - CBOOL]
 
-        elif dir < FLOAT:
-            return self.intList[dir - INT]
+        elif dir < CFLOAT:
+            return self.intList[dir - CINT]
 
-        elif dir < CHAR:
-            return self.floatList[dir - FLOAT]
+        elif dir < CCHAR:
+            return self.floatList[dir - CFLOAT]
 
-        elif dir < STRING:
-            return self.charList[dir - CHAR]
+        elif dir < CSTRING:
+            return self.charList[dir - CCHAR]
 
-        elif dir < LIM:
-            return self.stringList[dir - STRING]
+        elif dir < CLIM:
+            return self.stringList[dir - CSTRING]

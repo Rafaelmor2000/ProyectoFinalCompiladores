@@ -21,6 +21,13 @@ reserved = {
     "true": "TRUE",
     "false": "FALSE",
     "void": "VOID",
+    "pow": "POW",
+    "rand": "RAND",
+    "med": "MED",
+    "moda": "MODA",
+    "var": "VAR",
+    "reg": "REG",
+    "plot": "PLOT",
 }
 
 # --- Tokenizer

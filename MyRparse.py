@@ -180,6 +180,7 @@ def p_statementsp(p):
 def p_statementspp(p):
     """statementspp : assignment
     | call
+    | specCall
     | return
     | read
     | write"""
@@ -197,7 +198,8 @@ def p_assignment(p):
 
 def p_assignmentp(p):
     """assignmentp : expression
-    | call"""
+    | call
+    | specCall"""
 
 
 def p_call(p):
@@ -239,6 +241,135 @@ def p_call(p):
         operandStack.append({"id": id, "type": aux.get("type"), "dir": aux.get("dir")})
         assignment()
         operandStack.append(temp)
+
+
+def p_specCall(p):
+    "specCall : specCallp initParams LPAREN callp RPAREN"
+    global paramCounter, tempCont
+    id = p[1]
+
+    newQuad = Quad("ERA", EMPTY, EMPTY, id)
+    quadList.append(newQuad)
+
+    if id == "int":
+        if paramCounter != 1:
+            print(f"Wrong number of parameters in call to int")
+            sys.exit()
+
+        parameter = operandStack.pop()
+        if parameter.get("type") != "float" or parameter.get("arrSize") != 0:
+            print(
+                f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+            )
+            sys.exit()
+        newQuad = Quad("PARAM", parameter, EMPTY, 0)
+        quadList.append(newQuad)
+
+        genTemp("int")
+
+    elif id == "float":
+        if paramCounter != 1:
+            print(f"Wrong number of parameters in call to int")
+            sys.exit()
+
+        parameter = operandStack.pop()
+        if parameter.get("type") != "int" or parameter.get("arrSize") != 0:
+            print(
+                f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+            )
+            sys.exit()
+        newQuad = Quad("PARAM", parameter, EMPTY, 0)
+        quadList.append(newQuad)
+
+        genTemp("float")
+
+    elif id == "pow":
+        if paramCounter != 2:
+            print(f"Wrong number of parameters in call to int")
+            sys.exit()
+
+        for i in range(2):
+            print(operandStack)
+            parameter = operandStack.pop(-2 + i)
+            if (
+                parameter.get("type") == "float"
+                or parameter.get("type") == "int"
+                and parameter.get("arrSize") == 0
+            ):
+                newQuad = Quad("PARAM", parameter, EMPTY, i)
+                quadList.append(newQuad)
+
+            else:
+                print(
+                    f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+                )
+                sys.exit()
+
+        genTemp("float")
+
+    elif id == "rand":
+        if paramCounter != 0:
+            print(f"Wrong number of parameters in call to {id}")
+            sys.exit()
+
+    elif id == "plot":
+        if paramCounter != 2:
+            print(f"Wrong number of parameters in call to {id}")
+            sys.exit()
+
+    elif id == "reg":
+        if paramCounter != 2:
+            print(f"Wrong number of parameters in call to {id}")
+            sys.exit()
+
+    else:
+        if paramCounter != 1:
+            print(f"Wrong number of parameters in call to {id}")
+            sys.exit()
+
+    newQuad = Quad("GOSUB", EMPTY, EMPTY, "spec")
+    quadList.append(newQuad)
+
+    # currType, dir, params = findFunc(id)
+    # if params != paramCounter:
+    #     print(f"Wrong number of parameters in call to {id}")
+    #     sys.exit()
+
+    # newQuad = Quad("ERA", EMPTY, EMPTY, id)
+    # quadList.append(newQuad)
+
+    # keys = list(fnTable[id]["vars"])
+    # while paramCounter > 0:
+    #     parameter = operandStack.pop(-paramCounter)
+    #     key = keys[params - paramCounter]
+    #     if parameter.get("type") == fnTable[id]["vars"][key].get(
+    #         "type"
+    #     ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
+    #         newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter)
+
+    #         quadList.append(newQuad)
+    #         paramCounter -= 1
+    #     else:
+    #         print(
+    #             f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+    #         )
+    #         sys.exit()
+
+    # newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
+    # quadList.append(newQuad)
+
+
+def p_specCallp(p):
+    """specCallp : INT
+    | FLOAT
+    | POW
+    | RAND
+    | MED
+    | MODA
+    | VAR
+    | REG
+    | PLOT"""
+    p[0] = p[1]
 
 
 def p_callp(p):
@@ -298,8 +429,23 @@ def p_write(p):
     global operandStack, paramCounter
     while paramCounter > 0:
         temp = operandStack.pop(-paramCounter)
-        newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("dir"))
-        quadList.append(newQuad)
+        arrSize = temp.get("arrSize")
+        if arrSize > 1:
+            checkConstOverlap({"type": "string", "id": "[ "})
+            newQuad = Quad("PRINT", EMPTY, EMPTY, operandStack.pop().get("dir"))
+            quadList.append(newQuad)
+            for i in range(arrSize):
+                newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("dir") + i)
+                quadList.append(newQuad)
+                checkConstOverlap({"type": "string", "id": " "})
+                newQuad = Quad("PRINT", EMPTY, EMPTY, operandStack.pop().get("dir"))
+                quadList.append(newQuad)
+            checkConstOverlap({"type": "string", "id": "]"})
+            newQuad = Quad("PRINT", EMPTY, EMPTY, operandStack.pop().get("dir"))
+            quadList.append(newQuad)
+        else:
+            newQuad = Quad("PRINT", EMPTY, EMPTY, temp.get("dir"))
+            quadList.append(newQuad)
         paramCounter = paramCounter - 1
     checkConstOverlap({"type": "string", "id": "\n"})
     newQuad = Quad("PRINT", EMPTY, EMPTY, operandStack.pop().get("dir"))
@@ -524,14 +670,14 @@ def p_bool(p):
     "bool :"
     global operandStack
     cn = {"id": p[-1], "arrSize": 0, "type": "bool"}
-    dir = checkConstOverlap(cn)
+    checkConstOverlap(cn)
 
 
 def p_char(p):
     "char :"
     global operandStack
     cn = {"id": p[-1], "arrSize": 0, "type": "char"}
-    dir = checkConstOverlap(cn)
+    checkConstOverlap(cn)
 
 
 def p_string(p):
@@ -539,21 +685,21 @@ def p_string(p):
     global operandStack
     string = p[-1]
     cn = {"id": string[1:-1], "arrSize": 0, "type": "string"}
-    dir = checkConstOverlap(cn)
+    checkConstOverlap(cn)
 
 
 def p_int(p):
     "int :"
     global operandStack
     cn = {"id": p[-1], "arrSize": 0, "type": "int"}
-    dir = checkConstOverlap(cn)
+    checkConstOverlap(cn)
 
 
 def p_float(p):
     "float :"
     global operandStack
     cn = {"id": p[-1], "arrSize": 0, "type": "float"}
-    dir = checkConstOverlap(cn)
+    checkConstOverlap(cn)
 
 
 def p_type(p):
@@ -673,7 +819,7 @@ def findFunc(func):
         sys.exit()
 
 
-# append constand to operand stack, add to cnTable if it does not exist yet
+# append constand to operand stack, assign direction and add to cnTable if it does not exist yet
 def checkConstOverlap(cn):
     global cnTable
     id = cn.get("id")
@@ -685,7 +831,6 @@ def checkConstOverlap(cn):
 
     cn["dir"] = dir
     operandStack.append(cn)
-    # return dir
 
 
 # create quad for simple operations
@@ -751,4 +896,7 @@ if __name__ == "__main__":
 
     # inicializar y correr Maquina virtual
     vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
-    vm.run(quadList)
+
+    # show internal running data
+    show = True
+    vm.run(quadList, show)

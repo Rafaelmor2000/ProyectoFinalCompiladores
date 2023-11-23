@@ -2,6 +2,8 @@ import sys
 
 from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
+SPECFUNC = ["int", "float", "pow", "rand", "med", "moda", "var", "reg", "plot"]
+
 
 class VirtualMachine:
     # initialize virtual machine
@@ -18,11 +20,13 @@ class VirtualMachine:
         self.tMemory = tMemory
 
     # execute quads from quadlist
-    def run(self, quadList):
+    def run(self, quadList, show):
         self.curr = 0
         while quadList[self.curr].operator != "DONE":
             quad = quadList[self.curr]
-            print(quad, end=" ")
+
+            if show:
+                print(quad, end=" ")
             if quad.operand2 == None:
                 # execute more complex operations
 
@@ -61,30 +65,36 @@ class VirtualMachine:
 
                 # Make space for function execution
                 elif quad.operator == "ERA":
-                    reqTemps = self.fnTable[quad.temp].get("reqTemps")
-                    reqVars = self.fnTable[quad.temp].get("reqVars")
+                    if quad.temp not in SPECFUNC:
+                        reqTemps = self.fnTable[quad.temp].get("reqTemps")
+                        reqVars = self.fnTable[quad.temp].get("reqVars")
 
-                    self.lMemory.era(reqVars)
-                    self.tMemory.era(reqTemps)
+                        self.lMemory.era(reqVars)
+                        self.tMemory.era(reqTemps)
 
-                    self.funcStack.append(quad.temp)
-                    keys = list(self.fnTable[self.funcStack[-1]]["vars"])
-                    self.params = keys[: self.fnTable[self.funcStack[-1]]["params"]]
+                        self.funcStack.append(quad.temp)
+                        keys = list(self.fnTable[self.funcStack[-1]]["vars"])
+                        self.params = keys[: self.fnTable[self.funcStack[-1]]["params"]]
+                    else:
+                        self.funcStack.append(quad.temp)
 
                 # Find param data, save to appropriate direction
                 elif quad.operator == "PARAM":
-                    key = self.params[quad.temp]
-                    arrSize = self.fnTable[self.funcStack[-1]]["vars"][key].get(
-                        "arrSize"
-                    )
-                    dir = self.fnTable[self.funcStack[-1]]["vars"][key].get("dir")
-                    if arrSize > 1:
-                        for i in range(arrSize):
-                            value = self.getParam(quad.operand1 + i)
-                            self.saveValue(dir + i, value)
+                    if self.funcStack[-1] not in SPECFUNC:
+                        key = self.params[quad.temp]
+                        arrSize = self.fnTable[self.funcStack[-1]]["vars"][key].get(
+                            "arrSize"
+                        )
+                        dir = self.fnTable[self.funcStack[-1]]["vars"][key].get("dir")
+                        if arrSize > 1:
+                            for i in range(arrSize):
+                                value = self.getParam(quad.operand1 + i)
+                                self.saveValue(dir + i, value)
+                        else:
+                            value = self.getParam(quad.operand1)
+                            self.saveValue(dir, value)
                     else:
-                        value = self.getParam(quad.operand1)
-                        self.saveValue(dir, value)
+                        self.params.insert(0, quad.operand1)
 
                 # Exit function, adjust offsets
                 elif quad.operator == "RETURN":
@@ -113,8 +123,12 @@ class VirtualMachine:
                     self.exitFunc()
 
                 elif quad.operator == "GOSUB":
-                    self.jumpStack.append(self.curr)
-                    self.curr = quad.temp - 1
+                    if type(quad.temp) == int:
+                        self.jumpStack.append(self.curr)
+                        self.curr = quad.temp - 1
+                    else:
+                        dir = quadList[self.curr + 1].operand1
+                        self.doSpec(dir)
 
             else:
                 # execute simple operation
@@ -122,7 +136,8 @@ class VirtualMachine:
                 op2 = self.getValue(quad.operand2)
                 res = self.do(quad.operator, op1, op2)
                 self.saveValue(quad.temp, res)
-            print()
+            if show:
+                print()
             self.curr += 1
 
     # return value from appropriate memory direction
@@ -274,3 +289,24 @@ class VirtualMachine:
             sys.exit()
 
         return res
+
+    # Do special functions
+    def doSpec(self, dir):
+        func = self.funcStack.pop()
+        if len(self.funcStack) == 0:
+            curr = self.programID
+        else:
+            curr = self.funcStack[-1]
+
+        if func == "int":
+            x = int(self.getValue(self.params.pop()))
+            self.saveValue(dir, x)
+
+        if func == "float":
+            x = float(self.getValue(self.params.pop()))
+            self.saveValue(dir, x)
+
+        if func == "pow":
+            x = float(self.getValue(self.params.pop()))
+            y = float(self.getValue(self.params.pop()))
+            self.saveValue(dir, pow(x, y))
