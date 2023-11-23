@@ -82,6 +82,7 @@ class VirtualMachine:
                         self.params = keys[: self.fnTable[self.funcStack[-1]]["params"]]
 
                     else:
+                        self.params = []
                         self.funcStack.append(quad.temp)
 
                 # Find param data, save to appropriate direction
@@ -129,7 +130,7 @@ class VirtualMachine:
                     self.exitFunc()
 
                 elif quad.operator == "GOSUB":
-                    if type(quad.temp) == int:
+                    if quad.temp != "spec":
                         self.jumpStack.append(self.curr)
                         self.curr = quad.temp - 1
                     else:
@@ -148,6 +149,7 @@ class VirtualMachine:
 
     # return value from appropriate memory direction
     def getValue(self, dir):
+        print(dir)
         dir = self.getPointer(dir)
 
         if dir < GLOBALLIM:
@@ -228,7 +230,8 @@ class VirtualMachine:
     def getPointer(self, dir):
         if type(dir) == str:
             dir = int(dir[1:])
-            dir = self.getValue(dir)
+            if type(dir) == int:
+                dir = self.getValue(dir)
 
         dir = int(dir)
         return dir
@@ -316,52 +319,50 @@ class VirtualMachine:
         elif func == "rand":
             self.saveValue(dir, random())
 
-        elif func == "reg":
-            y = self.loadArr()
-            x = []
-            for i in range(len(y)):
-                x.append(i)
-
-            coef = np.polyfit(x, y, 1)
-            poly1d_fn = np.poly1d(coef)
-
-            fig, ux = plt.subplots()
-
-            ux.plot(x, y, ".")
-            ux.plot(poly1d_fn(x), "--k")
-
-            ux.set_title("Linear Regression")
-            ux.set_xlabel("x label")
-            ux.set_ylabel("y label")
-
-            plt.show()
-
-        elif func == "plot":
-            y = self.loadArr()
-            x = []
-            for i in range(len(y)):
-                x.append(i)
-
-            fig, ax = plt.subplots()
-            ax.plot(x, y, "." "-")
-
-            ax.set_title("Plot")
-            ax.set_xlabel("x label")
-            ax.set_ylabel("y label")
-
-            plt.show()
-
         else:
             arr = self.loadArr()
 
             if func == "med":
                 self.saveValue(dir, mean(arr))
 
-            if func == "moda":
+            elif func == "moda":
                 self.saveValue(dir, mode(arr))
 
-            if func == "var":
+            elif func == "var":
                 self.saveValue(dir, variance(arr))
+
+            elif func == "reg":
+                x = []
+                for i in range(len(arr)):
+                    x.append(i)
+
+                coef = np.polyfit(x, arr, 1)
+                poly1d_fn = np.poly1d(coef)
+
+                fig, ux = plt.subplots()
+
+                ux.plot(x, arr, ".")
+                ux.plot(poly1d_fn(x), "--k")
+
+                ux.set_title("Linear Regression")
+                ux.set_xlabel("x label")
+                ux.set_ylabel("y label")
+
+                plt.show()
+
+            elif func == "plot":
+                x = []
+                for i in range(len(arr)):
+                    x.append(i)
+
+                fig, ax = plt.subplots()
+                ax.plot(x, arr, "." "-")
+
+                ax.set_title("Plot")
+                ax.set_xlabel("x label")
+                ax.set_ylabel("y label")
+
+                plt.show()
 
     def loadArr(self):
         dir = self.params.pop()
@@ -375,6 +376,7 @@ class VirtualMachine:
         keys = list(self.fnTable[curr]["vars"])
 
         for key in keys:
+            print(self.fnTable[curr])
             if self.fnTable[curr]["vars"][key].get("dir") == dir:
                 arrSize = self.fnTable[curr]["vars"][key].get("arrSize")
                 break

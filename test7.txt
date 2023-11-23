@@ -1,23 +1,52 @@
 program test;
 vars
-int array[10], arrB[10], i;
-float f;
+int array[10], i;
+float f, arrB[10];
 
-function void normalFunc(int param1, int param2, int param3)
+function void testOnFunc(int arr[10])
 {
-    write(param1," ", param2," ", param3);
+    
+    i = int(5.8);
+    write(i);
+
+    f = float(5);
+    write(f);
+
+    f = pow(1.0, 2);
+    write(f);
+
+    f = rand();
+    write(f);
+
+    f = med(arr);
+    write(f);
+
+    f = moda(arr);
+    write(f);
+
+    f = var(arr);
+    write(f);
+
+    write(arr);
+
+    reg(arr);
+
+    plot(arr);
 }
 
 
 main(){
-    %load array
+    %load arrays
     for i = 0 to 9 do {
-        array[i] = int(f * 10);
         f = rand();
-        arrB[i] = int(f * 10);
-    }
+        array[i] = int(f * 10);
 
-    normalFunc(1, 2, 3);
+        f = rand();
+        arrB[i] = f * 10;
+    }
+    
+    testOnFunc(array);
+
 
     i = int(5.8);
     write(i);
@@ -42,9 +71,12 @@ main(){
     f = var(array);
     write(f);
 
+    write(array);
+    write(arrB);
+
+    reg(array);
     reg(arrB);
 
     plot(array);
-
-    write(array, array[5]);
+    plot(arrB);
 }
