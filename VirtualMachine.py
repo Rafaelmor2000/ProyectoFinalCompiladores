@@ -317,8 +317,10 @@ class VirtualMachine:
             self.saveValue(dir, random())
 
         elif func == "reg":
-            x = self.loadArr()
             y = self.loadArr()
+            x = []
+            for i in range(len(y)):
+                x.append(i)
 
             coef = np.polyfit(x, y, 1)
             poly1d_fn = np.poly1d(coef)
@@ -335,8 +337,10 @@ class VirtualMachine:
             plt.show()
 
         elif func == "plot":
-            x = self.loadArr()
             y = self.loadArr()
+            x = []
+            for i in range(len(y)):
+                x.append(i)
 
             fig, ax = plt.subplots()
             ax.plot(x, y, "." "-")
