@@ -129,6 +129,7 @@ class VirtualMachine:
                 elif quad.operator == "ENDFUNC":
                     self.exitFunc()
 
+                # save quad to return to, go to function
                 elif quad.operator == "GOSUB":
                     if quad.temp != "spec":
                         self.jumpStack.append(self.curr)
@@ -149,7 +150,6 @@ class VirtualMachine:
 
     # return value from appropriate memory direction
     def getValue(self, dir):
-        print(dir)
         dir = self.getPointer(dir)
 
         if dir < GLOBALLIM:
@@ -364,6 +364,7 @@ class VirtualMachine:
 
                 plt.show()
 
+    # load array for special function execution
     def loadArr(self):
         dir = self.params.pop()
         array = []
@@ -376,7 +377,6 @@ class VirtualMachine:
         keys = list(self.fnTable[curr]["vars"])
 
         for key in keys:
-            print(self.fnTable[curr])
             if self.fnTable[curr]["vars"][key].get("dir") == dir:
                 arrSize = self.fnTable[curr]["vars"][key].get("arrSize")
                 break

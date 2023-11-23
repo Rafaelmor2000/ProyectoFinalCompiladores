@@ -2,12 +2,8 @@ import sys
 
 from MemoryMap import GLOBALCHAR, GLOBALFLOAT, GLOBALINT, GLOBALLIM
 
-INT = GLOBALINT
-FLOAT = GLOBALFLOAT
-CHAR = GLOBALCHAR
-LIM = GLOBALLIM
 
-
+# Module designed for management of global memory
 class GlobalMemory:
     def __init__(self) -> None:
         self.intCount = 0
@@ -17,14 +13,15 @@ class GlobalMemory:
         self.charCount = 0
         self.charList = []
 
+    # Assign and initialize memory for global variables
     def malloc(self, var):
         varType = var.get("type")
 
         if varType == "int":
-            dir = INT
+            dir = GLOBALINT
             arrSize = int(var.get("arrSize"))
             dir += self.intCount + arrSize
-            if dir < INT or dir >= FLOAT:
+            if dir < GLOBALINT or dir >= GLOBALFLOAT:
                 print("no global memory for int variables available")
                 sys.exit()
             else:
@@ -38,10 +35,10 @@ class GlobalMemory:
                     self.intList.append(0)
 
         elif varType == "float":
-            dir = FLOAT
+            dir = GLOBALFLOAT
             arrSize = int(var.get("arrSize"))
             dir += self.floatCount + arrSize
-            if dir < FLOAT or dir >= CHAR:
+            if dir < GLOBALFLOAT or dir >= GLOBALCHAR:
                 print("no global memory for float variables available")
                 sys.exit()
 
@@ -56,10 +53,10 @@ class GlobalMemory:
                     self.floatList.append(0.0)
 
         else:
-            dir = CHAR
+            dir = GLOBALCHAR
             arrSize = int(var.get("arrSize"))
             dir += self.charCount + arrSize
-            if dir < CHAR or dir >= LIM:
+            if dir < GLOBALCHAR or dir >= GLOBALLIM:
                 print("no global memory for char variables available")
                 sys.exit()
 
@@ -75,58 +72,61 @@ class GlobalMemory:
 
         return dir
 
+    # Get value stored in direction
     def getValue(self, dir):
-        if dir < INT or dir >= LIM:
+        if dir < GLOBALINT or dir >= GLOBALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
-            return self.intList[dir - INT]
+        elif dir < GLOBALFLOAT:
+            return self.intList[dir - GLOBALINT]
 
-        elif dir < CHAR:
-            return self.floatList[dir - FLOAT]
+        elif dir < GLOBALCHAR:
+            return self.floatList[dir - GLOBALFLOAT]
 
-        elif dir < LIM:
-            return self.charList[dir - CHAR]
+        elif dir < GLOBALLIM:
+            return self.charList[dir - GLOBALCHAR]
 
+    # Save value to direction
     def saveValue(self, dir, value):
-        if dir < INT or dir >= LIM:
+        if dir < GLOBALINT or dir >= GLOBALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
-            self.intList[dir - INT] = value
+        elif dir < GLOBALFLOAT:
+            self.intList[dir - GLOBALINT] = value
 
-        elif dir < CHAR:
-            self.floatList[dir - FLOAT] = value
+        elif dir < GLOBALCHAR:
+            self.floatList[dir - GLOBALFLOAT] = value
 
-        elif dir < LIM:
-            self.charList[dir - CHAR] = value
+        elif dir < GLOBALLIM:
+            self.charList[dir - GLOBALCHAR] = value
 
+    # Verify input is of appropriate type, save to direction
     def read(self, dir, value):
-        if dir < INT or dir >= LIM:
+        if dir < GLOBALINT or dir >= GLOBALLIM:
             print("Invalid direction for variable")
             sys.exit()
 
-        elif dir < FLOAT:
+        elif dir < GLOBALFLOAT:
             try:
                 value = int(value)
             except:
                 print(f"Input value {value} is not of type int")
                 sys.exit()
-            self.intList[dir - INT] = value
+            self.intList[dir - GLOBALINT] = value
 
-        elif dir < CHAR:
+        elif dir < GLOBALCHAR:
             try:
                 value = float(value)
             except:
                 print(f"Input value {value} is not of type float")
                 sys.exit()
-            self.floatList[dir - FLOAT] = value
+            self.floatList[dir - GLOBALFLOAT] = value
 
-        elif dir < LIM:
+        elif dir < GLOBALLIM:
             if len(value) > 1:
                 print(f"Input value {value} is not of type char")
                 sys.exit()
             else:
-                self.charList[dir - CHAR] = value
+                self.charList[dir - GLOBALCHAR] = value

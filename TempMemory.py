@@ -16,7 +16,7 @@ from MemoryMap import (
 )
 
 
-# Temp Memory Manager
+# Module for management of both global and local temps
 class TempMemory:
     def __init__(self) -> None:
         # global temps
@@ -44,6 +44,7 @@ class TempMemory:
         self.lStringList = []
         self.tempOffsetMap = {"bool": 0, "int": 0, "float": 0, "char": 0, "string": 0}
 
+    # Assign memory space for temps, initialize global temps
     def malloc(self, tempType, isLocal):
         # local temps
         if isLocal:
@@ -243,6 +244,7 @@ class TempMemory:
         self.lCharList = self.lCharList[:-chars]
         self.lStringList = self.lStringList[:-strings]
 
+    # revert to previous state
     def revertOffset(self, reqMem):
         bools = reqMem.get("bool")
         ints = reqMem.get("int")
@@ -308,6 +310,7 @@ class TempMemory:
             elif dir < GLIM:
                 return self.gStringList[dir - GSTRING]
 
+    # get parameter from previous function
     def getParam(self, dir, reqMem):
         if dir < LLIM:
             if dir < LBOOL:

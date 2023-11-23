@@ -3,6 +3,7 @@ import sys
 from MemoryMap import CBOOL, CCHAR, CFLOAT, CINT, CLIM, CSTRING
 
 
+# Module for management of memory assigned to constants
 class ConstantMemory:
     def __init__(self) -> None:
         self.boolCount = 0
@@ -16,6 +17,7 @@ class ConstantMemory:
         self.stringCount = 0
         self.stringList = []
 
+    # Assign and initialize memory for constants
     def malloc(self, var):
         varType = var.get("type")
         value = var.get("id")
@@ -75,6 +77,7 @@ class ConstantMemory:
 
         return dir
 
+    # return value stored in direction
     def getValue(self, dir):
         if dir < CBOOL or dir >= CLIM:
             print("Invalid direction for temp")

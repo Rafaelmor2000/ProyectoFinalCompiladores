@@ -3,6 +3,7 @@ import sys
 from MemoryMap import LOCALCHAR, LOCALFLOAT, LOCALINT, LOCALLIM
 
 
+# Module designed for management of local variables
 class LocalMemory:
     def __init__(self) -> None:
         self.intCount = 0
@@ -13,6 +14,7 @@ class LocalMemory:
         self.charList = []
         self.varOffsetMap = {"int": 0, "float": 0, "char": 0}
 
+    # Assign memory for local variables, save offset map
     def malloc(self, var):
         varType = var.get("type")
 
@@ -63,6 +65,7 @@ class LocalMemory:
 
         return dir
 
+    # Save required memory for function, reset counters
     def clear(self):
         reqMem = {
             "int": self.intCount,
@@ -131,6 +134,7 @@ class LocalMemory:
         if chars > 0:
             self.charListharList = self.charList[:-chars]
 
+    # revert offset to previous state
     def revertOffset(self, reqMem):
         ints = reqMem.get("int")
         floats = reqMem.get("float")
@@ -146,6 +150,7 @@ class LocalMemory:
         if self.varOffsetMap["char"] < 0:
             self.varOffsetMap["char"] = 0
 
+    # get value stored in a memory direction
     def getValue(self, dir):
         if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
@@ -159,6 +164,7 @@ class LocalMemory:
         elif dir < LOCALLIM:
             return self.charList[dir - LOCALCHAR + self.varOffsetMap["char"]]
 
+    # get param from a previous function
     def getParam(self, dir, reqMem):
         if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
@@ -179,6 +185,7 @@ class LocalMemory:
                 dir - LOCALCHAR + self.varOffsetMap["char"] - reqMem["char"]
             ]
 
+    # save value to a memory direction
     def saveValue(self, dir, value):
         if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")
@@ -193,6 +200,7 @@ class LocalMemory:
         elif dir < LOCALLIM:
             self.charList[dir - LOCALCHAR + self.varOffsetMap["char"]] = value
 
+    # Verify input is of correct type, save to a memory direction
     def read(self, dir, value):
         if dir < LOCALINT or dir >= LOCALLIM:
             print("Invalid direction for variable")

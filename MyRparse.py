@@ -424,6 +424,7 @@ def p_return(p):
         sys.exit()
 
 
+# generate quads to read inputs
 def p_read(p):
     "read : READ initParams LPAREN readp RPAREN"
     global operandStack, paramCounter
@@ -434,6 +435,7 @@ def p_read(p):
         paramCounter = paramCounter - 1
 
 
+# count parameters in read
 def p_readp(p):
     "readp : variable readpp"
     global paramCounter
@@ -481,6 +483,7 @@ def p_initParams(p):
     paramCounter = 0
 
 
+# count amount of parameters in write
 def p_writep(p):
     """writep : expression writepp
     | CTE_S string writepp"""
@@ -502,6 +505,7 @@ def p_conditionp(p):
     | empty"""
 
 
+# test expression is of bool type, add jump to stack
 def p_c1(p):
     "c1 : RPAREN"
     jumpStack.append(len(quadList))
@@ -514,6 +518,7 @@ def p_c1(p):
         sys.exit()
 
 
+# generate quad to skip to end of else, fill jump from stack
 def p_c2(p):
     "c2 :"
     quadList[jumpStack.pop()].fill(len(quadList) + 1)
@@ -523,6 +528,7 @@ def p_c2(p):
     quadList.append(newQuad)
 
 
+# fill jump from stack
 def p_c3(p):
     "c3 :"
     quadList[jumpStack.pop()].fill(len(quadList))
@@ -537,11 +543,13 @@ def p_while(p):
     "while : WHILE w1 LPAREN expression w2 DO statements w3"
 
 
+# add jump to stack
 def p_w1(p):
     "w1 :"
     jumpStack.append(len(quadList))
 
 
+# test expression is of bool type and add jump to stack
 def p_w2(p):
     "w2 : RPAREN"
     aux = operandStack.pop()
@@ -554,6 +562,7 @@ def p_w2(p):
         sys.exit()
 
 
+# generate quad to go back to beginning of while
 def p_w3(p):
     "w3 :"
     aux = jumpStack.pop()
@@ -562,6 +571,7 @@ def p_w3(p):
     quadList[aux].fill(len(quadList))
 
 
+# create quads to sum 1 to variable and to go back to beginning of for
 def p_for(p):
     "for : FOR ID EQUAL expression f1 expression f2 statements"
     var = operandStack.pop()
@@ -575,6 +585,7 @@ def p_for(p):
     quadList[aux].fill(len(quadList))
 
 
+# test starting value is of int type and add jump to stack
 def p_f1(p):
     "f1 : TO"
     aux = operandStack.pop()
@@ -592,6 +603,7 @@ def p_f1(p):
         sys.exit()
 
 
+# generate quads to test var is less or equal to limit and to go to end of for when false
 def p_f2(p):
     "f2 : DO"
     global tempCont
@@ -654,6 +666,7 @@ def p_variable(p):
     "variable : ID variablep"
 
 
+# load variable to operand stack
 def p_variablep(p):
     """variablep : LBRACKET expression RBRACKET
     | empty"""
@@ -920,5 +933,5 @@ if __name__ == "__main__":
     vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
 
     # show internal running data
-    show = True
+    show = False
     vm.run(quadList, show)
