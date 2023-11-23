@@ -1,4 +1,5 @@
 import sys
+from random import random
 
 from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
@@ -310,3 +311,18 @@ class VirtualMachine:
             x = float(self.getValue(self.params.pop()))
             y = float(self.getValue(self.params.pop()))
             self.saveValue(dir, pow(x, y))
+
+        if func == "rand":
+            self.saveValue(dir, random())
+
+        if func == "reg":
+            xDir = self.getValue(self.params.pop())
+            yDir = self.getValue(self.params.pop())
+
+        # if func == "plot":
+
+        # if func == "med":
+
+        # if func == "moda":
+
+        # if func == "var":

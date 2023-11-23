@@ -3,10 +3,9 @@ vars
 int array[10], i;
 float f;
 
-function int normalFunc(int param1, int param2, int param3)
+function void normalFunc(int param1, int param2, int param3)
 {
     write(param1," ", param2," ", param3);
-    return(1);
 }
 
 
@@ -26,7 +25,11 @@ main(){
     f = float(5);
     write(f);
 
-    pow(1, 2.0);
+    f = pow(1.0, 2);
+    write(f);
+
+    f = rand();
+    write(f);
 
     write(array, array[5]);
 }

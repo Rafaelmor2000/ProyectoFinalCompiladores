@@ -179,11 +179,22 @@ def p_statementsp(p):
 
 def p_statementspp(p):
     """statementspp : assignment
-    | call
-    | specCall
+    | voidCall
     | return
     | read
     | write"""
+
+
+def p_voidCall(p):
+    """voidCall : call
+    | specCall"""
+    if p[1] in fnTable:
+        if fnTable[p[1]].get("type") != "void":
+            print(f"Return from function is not being saved")
+            sys.exit()
+    elif p[1] != "reg" or p[1] != "plot":
+        print(f"Return from function is not being saved")
+        sys.exit()
 
 
 def p_statementsppp(p):
@@ -198,14 +209,26 @@ def p_assignment(p):
 
 def p_assignmentp(p):
     """assignmentp : expression
-    | call
+    | funcCall"""
+
+
+def p_funcCall(p):
+    """funcCall : call
     | specCall"""
+    if p[1] in fnTable:
+        if fnTable[p[1]].get("type") == "void":
+            print(f"Cannot assign from void function")
+            sys.exit()
+    elif p[1] == "reg" or p[1] == "plot":
+        print(f"Cannot assign from void function")
+        sys.exit()
 
 
 def p_call(p):
     "call : ID initParams LPAREN callp RPAREN"
     global paramCounter, tempCont
     id = p[1]
+    p[0] = p[1]
     currType, dir, params = findFunc(id)
     if params != paramCounter:
         print(f"Wrong number of parameters in call to {id}")
@@ -247,6 +270,7 @@ def p_specCall(p):
     "specCall : specCallp initParams LPAREN callp RPAREN"
     global paramCounter, tempCont
     id = p[1]
+    p[0] = p[1]
 
     newQuad = Quad("ERA", EMPTY, EMPTY, id)
     quadList.append(newQuad)
@@ -259,7 +283,7 @@ def p_specCall(p):
         parameter = operandStack.pop()
         if parameter.get("type") != "float" or parameter.get("arrSize") != 0:
             print(
-                f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+                f"Parameter types or arrSize in line {p.lineno!r} do not match call to {id}"
             )
             sys.exit()
         newQuad = Quad("PARAM", parameter, EMPTY, 0)
@@ -275,7 +299,7 @@ def p_specCall(p):
         parameter = operandStack.pop()
         if parameter.get("type") != "int" or parameter.get("arrSize") != 0:
             print(
-                f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+                f"Parameter types or arrSize in line {p.lineno!r} do not match call to {id}"
             )
             sys.exit()
         newQuad = Quad("PARAM", parameter, EMPTY, 0)
@@ -289,7 +313,6 @@ def p_specCall(p):
             sys.exit()
 
         for i in range(2):
-            print(operandStack)
             parameter = operandStack.pop(-2 + i)
             if (
                 parameter.get("type") == "float"
@@ -312,20 +335,65 @@ def p_specCall(p):
             print(f"Wrong number of parameters in call to {id}")
             sys.exit()
 
+        genTemp("float")
+
     elif id == "plot":
         if paramCounter != 2:
             print(f"Wrong number of parameters in call to {id}")
             sys.exit()
+
+        for i in range(2):
+            parameter = operandStack.pop(-2 + i)
+            if (
+                parameter.get("type") == "float"
+                or parameter.get("type") == "int"
+                and parameter.get("arrSize") > 1
+            ):
+                newQuad = Quad("PARAM", parameter, EMPTY, i)
+                quadList.append(newQuad)
+
+            else:
+                print(
+                    f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+                )
+                sys.exit()
 
     elif id == "reg":
         if paramCounter != 2:
             print(f"Wrong number of parameters in call to {id}")
             sys.exit()
 
+        for i in range(2):
+            parameter = operandStack.pop(-2 + i)
+            if (
+                parameter.get("type") == "float"
+                or parameter.get("type") == "int"
+                and parameter.get("arrSize") > 1
+            ):
+                newQuad = Quad("PARAM", parameter, EMPTY, i)
+                quadList.append(newQuad)
+
+            else:
+                print(
+                    f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
+                )
+                sys.exit()
+
     else:
         if paramCounter != 1:
             print(f"Wrong number of parameters in call to {id}")
             sys.exit()
+
+        parameter = operandStack.pop()
+        if parameter.get("type") != "int" or parameter.get("arrSize") > 1:
+            print(
+                f"Parameter types or arrSize in line {p.lineno!r} do not match call to {id}"
+            )
+            sys.exit()
+        newQuad = Quad("PARAM", parameter, EMPTY, 0)
+        quadList.append(newQuad)
+
+        genTemp("float")
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, "spec")
     quadList.append(newQuad)
