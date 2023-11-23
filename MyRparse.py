@@ -385,46 +385,21 @@ def p_specCall(p):
             sys.exit()
 
         parameter = operandStack.pop()
-        if parameter.get("type") != "int" or parameter.get("arrSize") > 1:
-            print(
-                f"Parameter types or arrSize in line {p.lineno!r} do not match call to {id}"
-            )
+        if (
+            parameter.get("type") != "int"
+            or parameter.get("type") != "float"
+            and parameter.get("arrSize") > 1
+        ):
+            newQuad = Quad("PARAM", parameter, EMPTY, 0)
+            quadList.append(newQuad)
+        else:
+            print(f"Parameter types or arrSize do not match call to {id}")
             sys.exit()
-        newQuad = Quad("PARAM", parameter, EMPTY, 0)
-        quadList.append(newQuad)
 
         genTemp("float")
 
     newQuad = Quad("GOSUB", EMPTY, EMPTY, "spec")
     quadList.append(newQuad)
-
-    # currType, dir, params = findFunc(id)
-    # if params != paramCounter:
-    #     print(f"Wrong number of parameters in call to {id}")
-    #     sys.exit()
-
-    # newQuad = Quad("ERA", EMPTY, EMPTY, id)
-    # quadList.append(newQuad)
-
-    # keys = list(fnTable[id]["vars"])
-    # while paramCounter > 0:
-    #     parameter = operandStack.pop(-paramCounter)
-    #     key = keys[params - paramCounter]
-    #     if parameter.get("type") == fnTable[id]["vars"][key].get(
-    #         "type"
-    #     ) and parameter.get("arrSize") == fnTable[id]["vars"][key].get("arrSize"):
-    #         newQuad = Quad("PARAM", parameter, EMPTY, params - paramCounter)
-
-    #         quadList.append(newQuad)
-    #         paramCounter -= 1
-    #     else:
-    #         print(
-    #             f"Parameter types or arrSize in line {p.lineno(1)!r} do not match call to {id}"
-    #         )
-    #         sys.exit()
-
-    # newQuad = Quad("GOSUB", EMPTY, EMPTY, dir)
-    # quadList.append(newQuad)
 
 
 def p_specCallp(p):

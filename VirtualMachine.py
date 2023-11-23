@@ -1,5 +1,6 @@
 import sys
 from random import random
+from statistics import mean, mode, variance
 
 from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
@@ -294,35 +295,58 @@ class VirtualMachine:
     # Do special functions
     def doSpec(self, dir):
         func = self.funcStack.pop()
-        if len(self.funcStack) == 0:
-            curr = self.programID
-        else:
-            curr = self.funcStack[-1]
 
         if func == "int":
             x = int(self.getValue(self.params.pop()))
             self.saveValue(dir, x)
 
-        if func == "float":
+        elif func == "float":
             x = float(self.getValue(self.params.pop()))
             self.saveValue(dir, x)
 
-        if func == "pow":
+        elif func == "pow":
             x = float(self.getValue(self.params.pop()))
             y = float(self.getValue(self.params.pop()))
             self.saveValue(dir, pow(x, y))
 
-        if func == "rand":
+        elif func == "rand":
             self.saveValue(dir, random())
 
-        if func == "reg":
-            xDir = self.getValue(self.params.pop())
-            yDir = self.getValue(self.params.pop())
+        # if func == "reg":
+        #     xDir = self.getValue(self.params.pop())
+        #     yDir = self.getValue(self.params.pop())
 
         # if func == "plot":
 
-        # if func == "med":
+        else:
+            arr = self.loadArr()
 
-        # if func == "moda":
+            if func == "med":
+                self.saveValue(dir, mean(arr))
 
-        # if func == "var":
+            if func == "moda":
+                self.saveValue(dir, mode(arr))
+
+            if func == "var":
+                self.saveValue(dir, variance(arr))
+
+    def loadArr(self):
+        dir = self.params.pop()
+        array = []
+
+        if len(self.funcStack) == 0:
+            curr = self.programID
+        else:
+            curr = self.funcStack[-1]
+
+        keys = list(self.fnTable[curr]["vars"])
+
+        for key in keys:
+            if self.fnTable[curr]["vars"][key].get("dir") == dir:
+                arrSize = self.fnTable[curr]["vars"][key].get("arrSize")
+                break
+
+        for i in range(arrSize):
+            array.append(self.getValue(dir + i))
+
+        return array

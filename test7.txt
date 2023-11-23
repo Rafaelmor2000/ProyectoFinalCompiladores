@@ -31,5 +31,14 @@ main(){
     f = rand();
     write(f);
 
+    f = med(array);
+    write(f);
+
+    f = moda(array);
+    write(f);
+
+    f = var(array);
+    write(f);
+
     write(array, array[5]);
 }
