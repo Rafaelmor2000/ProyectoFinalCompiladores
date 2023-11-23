@@ -1,0 +1,38 @@
+program find;
+vars 
+int i, array[100];
+float x;
+
+function void bubbleSort()
+vars
+int n, m, aux;
+{
+    for n = 0 to 99 do {
+        m = 0;
+        while (m < 99 - n) do {
+            if (array[m] > array[m + 1]) then {
+                aux = array[m];
+                array[m] = array[m+1];
+                array[m+1] = aux;
+            }
+            m = m + 1;
+        }
+    }
+}
+
+main(){
+
+    %Cargar array con valores aleatorios entre 0 y 100
+    for i = 0 to 99 do{
+        x = rand();
+        array[i] =  int(x * 100);
+    }
+
+    %Desplegar arreglo antes de ordenamiento
+    write(array);
+
+    bubbleSort();
+
+    %Desplegar arreglo ordenado
+    write(array);
+}
