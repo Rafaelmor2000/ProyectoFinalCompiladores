@@ -262,7 +262,9 @@ def p_call(p):
         genTemp(currType)
         temp = operandStack[-1]
         aux = fnTable[programID]["vars"][id]
-        operandStack.append({"id": id, "type": aux.get("type"), "dir": aux.get("dir")})
+        operandStack.append(
+            {"id": id, "type": aux.get("type"), "dir": aux.get("dir"), "arrSize": 0}
+        )
         assignment()
         operandStack.append(temp)
 
