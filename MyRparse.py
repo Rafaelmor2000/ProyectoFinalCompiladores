@@ -952,5 +952,5 @@ if __name__ == "__main__":
     vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
 
     # show internal running data
-    show = False
+    show = True
     vm.run(quadList, show)
