@@ -2,6 +2,9 @@ import sys
 from random import random
 from statistics import mean, mode, variance
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from MemoryMap import CLIM, GLIM, GLOBALLIM, LLIM, LOCALLIM
 
 SPECFUNC = ["int", "float", "pow", "rand", "med", "moda", "var", "reg", "plot"]
@@ -77,6 +80,7 @@ class VirtualMachine:
                         self.funcStack.append(quad.temp)
                         keys = list(self.fnTable[self.funcStack[-1]]["vars"])
                         self.params = keys[: self.fnTable[self.funcStack[-1]]["params"]]
+
                     else:
                         self.funcStack.append(quad.temp)
 
@@ -312,11 +316,36 @@ class VirtualMachine:
         elif func == "rand":
             self.saveValue(dir, random())
 
-        # if func == "reg":
-        #     xDir = self.getValue(self.params.pop())
-        #     yDir = self.getValue(self.params.pop())
+        elif func == "reg":
+            x = self.loadArr()
+            y = self.loadArr()
 
-        # if func == "plot":
+            coef = np.polyfit(x, y, 1)
+            poly1d_fn = np.poly1d(coef)
+
+            fig, ux = plt.subplots()
+
+            ux.plot(x, y, ".")
+            ux.plot(poly1d_fn(x), "--k")
+
+            ux.set_title("Linear Regression")
+            ux.set_xlabel("x label")
+            ux.set_ylabel("y label")
+
+            plt.show()
+
+        elif func == "plot":
+            x = self.loadArr()
+            y = self.loadArr()
+
+            fig, ax = plt.subplots()
+            ax.plot(x, y, "." "-")
+
+            ax.set_title("Plot")
+            ax.set_xlabel("x label")
+            ax.set_ylabel("y label")
+
+            plt.show()
 
         else:
             arr = self.loadArr()

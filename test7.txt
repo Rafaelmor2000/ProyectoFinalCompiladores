@@ -1,6 +1,6 @@
 program test;
 vars
-int array[10], i;
+int array[10], arrB[10], i;
 float f;
 
 function void normalFunc(int param1, int param2, int param3)
@@ -13,6 +13,8 @@ main(){
     %load array
     for i = 0 to 9 do {
         array[i] = i;
+        f = rand();
+        arrB[i] = int(f * 10);
     }
 
     normalFunc(1, 2, 3);
@@ -39,6 +41,10 @@ main(){
 
     f = var(array);
     write(f);
+
+    reg(array, arrB);
+
+    plot(array, arrB);
 
     write(array, array[5]);
 }

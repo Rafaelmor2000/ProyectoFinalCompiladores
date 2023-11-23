@@ -188,11 +188,12 @@ def p_statementspp(p):
 def p_voidCall(p):
     """voidCall : call
     | specCall"""
+    print(p[1])
     if p[1] in fnTable:
         if fnTable[p[1]].get("type") != "void":
             print(f"Return from function is not being saved")
             sys.exit()
-    elif p[1] != "reg" or p[1] != "plot":
+    elif p[1] != "reg" and p[1] != "plot":
         print(f"Return from function is not being saved")
         sys.exit()
 
