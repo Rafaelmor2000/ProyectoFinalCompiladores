@@ -591,7 +591,7 @@ def p_for(p):
 def p_f1(p):
     "f1 : TO"
     aux = operandStack.pop()
-    if aux.get("type") == "int":
+    if aux.get("type") == "int" and aux.get("arrSize") < 2:
         var = findIdType(p[-3])
         operandStack.append(aux)
         assignment()
@@ -921,6 +921,9 @@ parser = yacc.yacc()
 # get input
 if __name__ == "__main__":
     fileName = sys.argv[1]
+    show = False
+    if len(sys.argv) > 2:
+        show = True
 
     # Probar que exista archivo y abrirlo
     if isfile(fileName):
@@ -940,7 +943,7 @@ if __name__ == "__main__":
         print()
 
     # mostrar tabla de constantes
-    # print(cnTable)
+    print(cnTable)
 
     # mostrar quads en lista
     cont = 0
@@ -952,5 +955,4 @@ if __name__ == "__main__":
     vm = VirtualMachine(programID, fnTable, gMemory, lMemory, cMemory, tMemory)
 
     # show internal running data
-    show = True
     vm.run(quadList, show)

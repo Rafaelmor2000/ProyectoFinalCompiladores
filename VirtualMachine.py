@@ -103,7 +103,7 @@ class VirtualMachine:
                     else:
                         self.params.insert(0, quad.operand1)
 
-                # Exit function, adjust offsets
+                # Save return, exit function and adjust offsets
                 elif quad.operator == "RETURN":
                     dir = self.fnTable[self.programID]["vars"][self.funcStack[-1]].get(
                         "dir"
